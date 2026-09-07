@@ -67,7 +67,7 @@ function setPipelineStatus(state, text) {
 }
 
 function showSkeleton() {
-  el.chartLoading.hidden = false;
+  el.chartLoading.style.display = "flex";
   [el.latestClose, el.dailyChange, el.sma].forEach((node) => {
     node.innerHTML =
       '<span class="skeleton" style="display:inline-block;width:60%;height:1.4rem;vertical-align:middle;"></span>';
@@ -81,7 +81,7 @@ function showSkeleton() {
 }
 
 function clearSkeleton() {
-  el.chartLoading.hidden = true;
+  el.chartLoading.style.display = "none";
   [el.latestClose, el.dailyChange, el.sma].forEach((node) => {
     if (node.querySelector(".skeleton")) {
       node.textContent = "—";
@@ -252,10 +252,10 @@ function renderTickers() {
 let chartLoadingTimer = null;
 
 function showChartLoading() {
-  el.chartLoading.hidden = false;
+  el.chartLoading.style.display = "flex";
   if (chartLoadingTimer) clearTimeout(chartLoadingTimer);
   chartLoadingTimer = setTimeout(() => {
-    el.chartLoading.hidden = true;
+    el.chartLoading.style.display = "none";
   }, 250);
 }
 

@@ -229,15 +229,11 @@ main.container {
 .chart-loading {
   position: absolute;
   inset: 0;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   background: rgba(13, 17, 23, 0.55);
   border-radius: var(--radius);
-}
-
-.chart-loading[hidden] {
-  display: none;
 }
 
 .spinner {
