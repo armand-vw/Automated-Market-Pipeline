@@ -236,6 +236,10 @@ main.container {
   border-radius: var(--radius);
 }
 
+.chart-loading[hidden] {
+  display: none;
+}
+
 .spinner {
   width: 32px;
   height: 32px;
