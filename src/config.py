@@ -4,37 +4,78 @@ Edit these constants to change pipeline behaviour without touching any
 processing or notification logic.
 """
 
-# Tickers to fetch (equities, indices and forex pairs supported by yfinance).
+# Tickers to fetch (equities, indices, forex and commodities supported by
+# yfinance).
 TICKERS = [
+    # Equities — global top 10 by market cap.
     "MSFT",
     "AMZN",
+    "NVDA",
+    "AAPL",
+    "GOOGL",
+    "META",
+    "AVGO",
+    "BRK-B",
+    "TSM",
+    "LLY",
+    "2222.SR",
+    # Indices — broad market health (global & local).
     "^GSPC",
     "^IXIC",
-    "^NDX",
-    "^DJI",
+    "^J203.JO",
+    # Forex — key currency pairs.
     "USDZAR=X",
+    "EURUSD=X",
+    "GBPZAR=X",
+    # Commodities — inflation & industrial indicators.
+    "GC=F",
+    "CL=F",
 ]
 
 # Friendly display names shown on the dashboard and in Discord alerts.
 TICKER_LABELS = {
     "MSFT": "Microsoft",
     "AMZN": "Amazon",
+    "NVDA": "NVIDIA",
+    "AAPL": "Apple",
+    "GOOGL": "Alphabet",
+    "META": "Meta",
+    "AVGO": "Broadcom",
+    "BRK-B": "Berkshire Hathaway",
+    "TSM": "TSMC",
+    "LLY": "Eli Lilly",
+    "2222.SR": "Saudi Aramco",
     "^GSPC": "S&P 500",
     "^IXIC": "NASDAQ Composite",
-    "^NDX": "NASDAQ-100",
-    "^DJI": "Dow Jones",
+    "^J203.JO": "JSE Top 40",
     "USDZAR=X": "USD / ZAR",
+    "EURUSD=X": "EUR / USD",
+    "GBPZAR=X": "GBP / ZAR",
+    "GC=F": "Gold Futures",
+    "CL=F": "WTI Crude Oil",
 }
 
 # Asset categories used to group the dashboard dropdown and formatting.
 TICKER_GROUPS = {
     "MSFT": "Equities",
     "AMZN": "Equities",
+    "NVDA": "Equities",
+    "AAPL": "Equities",
+    "GOOGL": "Equities",
+    "META": "Equities",
+    "AVGO": "Equities",
+    "BRK-B": "Equities",
+    "TSM": "Equities",
+    "LLY": "Equities",
+    "2222.SR": "Equities",
     "^GSPC": "Indices",
     "^IXIC": "Indices",
-    "^NDX": "Indices",
-    "^DJI": "Indices",
+    "^J203.JO": "Indices",
     "USDZAR=X": "FX",
+    "EURUSD=X": "FX",
+    "GBPZAR=X": "FX",
+    "GC=F": "Commodities",
+    "CL=F": "Commodities",
 }
 
 # Number of calendar days of daily OHLCV data to fetch.

@@ -10,10 +10,19 @@ A serverless, decoupled market data pipeline and analytics dashboard. A Python E
 
 ## Features
 
-- **Nightly ETL** — fetches 30 days of OHLCV data for equities (`MSFT`, `AMZN`), major US indices (`^GSPC`, `^IXIC`, `^NDX`, `^DJI`), and FX (`USDZAR=X`) via `yfinance`.
+- **Nightly ETL** — fetches 30 days of OHLCV data for 19 assets across equities, indices, forex, and commodities via `yfinance`.
 - **Indicators** — computes a 7-day simple moving average and daily percentage change.
 - **Discord alerts** — posts a rich embed when an asset's daily return falls at or below `-2.5%`.
 - **Interactive dashboard** — metric cards, a grouped asset selector, a Chart.js line chart, and a historical logs table.
+
+## Tracked assets
+
+| Group | Assets |
+| ----- | ------ |
+| **Equities** (top 10 by market cap + mega caps) | `MSFT`, `AMZN`, `NVDA`, `AAPL`, `GOOGL`, `META`, `AVGO`, `BRK-B`, `TSM`, `LLY`, `2222.SR` |
+| **Indices** (global & local) | `^GSPC` (S&P 500), `^IXIC` (NASDAQ Composite), `^J203.JO` (JSE Top 40) |
+| **FX** (forex & macro) | `USDZAR=X`, `EURUSD=X`, `GBPZAR=X` |
+| **Commodities** (inflation & industrial) | `GC=F` (Gold), `CL=F` (WTI Crude Oil) |
 
 ## Architecture
 
@@ -67,9 +76,9 @@ All tunable settings live in [`src/config.py`](src/config.py):
 
 | Constant           | Default            | Purpose                                   |
 | ------------------ | ------------------ | ----------------------------------------- |
-| `TICKERS`          | `MSFT, AMZN, ^GSPC, ^IXIC, ^NDX, ^DJI, USDZAR=X` | Assets to fetch        |
+| `TICKERS`          | 19 assets across equities, indices, FX & commodities | Assets to fetch |
 | `TICKER_LABELS`    | friendly names     | Display names for the dashboard & alerts  |
-| `TICKER_GROUPS`    | `Equities/Indices/FX` | Category used to group the selector   |
+| `TICKER_GROUPS`    | `Equities/Indices/FX/Commodities` | Category used to group the selector |
 | `LOOKBACK_DAYS`    | `30`               | Days of history to fetch                  |
 | `SMA_WINDOW`       | `7`                | Simple moving average window              |
 | `ALERT_THRESHOLD`  | `-2.5`             | Daily return that triggers a Discord alert|
@@ -78,8 +87,8 @@ All tunable settings live in [`src/config.py`](src/config.py):
 ## Deployment
 
 1. **Discord secret** — in the repo go to *Settings → Secrets and variables → Actions* and add `DISCORD_WEBHOOK_URL`.
-2. **GitHub Pages** — go to *Settings → Pages* and set *Source* to **Deploy from a branch**, branch `main`, folder `/ (root)`.
-3. The nightly workflow (`0 0 * * *`) and any manual run (`Actions → Market Data Pipeline → Run workflow`) will fetch data, update `data/market_data.json`, and commit it back to `main`, which rebuilds the Pages site automatically.
+2. **GitHub Pages** — go to *Settings → Pages* and set *Source* to **GitHub Actions** (the pipeline deploys via `actions/deploy-pages` on every run).
+3. The nightly workflow (`0 0 * * *`) and any manual run (`Actions → Market Data Pipeline → Run workflow`) will fetch data, update `data/market_data.json`, commit it back to `main`, and redeploy the site automatically.
 
 ## License
 

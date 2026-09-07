@@ -5,7 +5,7 @@
 const DATA_URL = "./data/market_data.json";
 
 // Dropdown group display order.
-const GROUP_ORDER = ["Equities", "Indices", "FX"];
+const GROUP_ORDER = ["Equities", "Indices", "FX", "Commodities"];
 
 let marketData = null;
 let chart = null;
