@@ -83,7 +83,9 @@ function showSkeleton() {
 function clearSkeleton() {
   el.chartLoading.hidden = true;
   [el.latestClose, el.dailyChange, el.sma].forEach((node) => {
-    node.textContent = "—";
+    if (node.querySelector(".skeleton")) {
+      node.textContent = "—";
+    }
   });
 }
 
@@ -143,6 +145,8 @@ function renderTable(block) {
 }
 
 function renderChart(block) {
+  if (typeof Chart === "undefined") return;
+
   const records = block.records || [];
   const labels = records.map((r) => r.date);
   const close = records.map((r) => r.close);
@@ -262,13 +266,24 @@ function update() {
   showChartLoading();
   renderSummary(block);
   renderTable(block);
-  renderChart(block);
+  try {
+    renderChart(block);
+  } catch (err) {
+    console.error("Chart render failed:", err);
+  }
 }
 
 async function init() {
-  showSkeleton();
   try {
-    const res = await fetch(DATA_URL);
+    showSkeleton();
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+    const res = await fetch(DATA_URL, {
+      cache: "no-store",
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     marketData = await res.json();
 
@@ -294,9 +309,10 @@ async function init() {
   } catch (err) {
     console.error("Failed to load market data:", err);
     setPipelineStatus("error", "Pipeline unavailable");
-    clearSkeleton();
     el.tbody.innerHTML =
       '<tr><td colspan="7" class="empty-state">Unable to load market data</td></tr>';
+  } finally {
+    clearSkeleton();
   }
 }
 
