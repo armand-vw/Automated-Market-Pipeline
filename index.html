@@ -17,9 +17,14 @@
   </head>
   <body>
     <header class="site-header">
-      <div class="container">
-        <h1>Automated Market Pipeline</h1>
-        <p class="subtitle">Serverless market data &amp; analytics dashboard</p>
+      <div class="container header-row">
+        <div>
+          <h1>Automated Market Pipeline</h1>
+          <p class="subtitle">Serverless market data &amp; analytics dashboard</p>
+        </div>
+        <span id="pipeline-status" class="status-badge" data-state="loading">
+          Pipeline status &middot; connecting&hellip;
+        </span>
       </div>
     </header>
 
@@ -27,7 +32,6 @@
       <section class="toolbar">
         <label for="asset-select">Asset</label>
         <select id="asset-select" aria-label="Select asset"></select>
-        <span id="last-updated" class="muted"></span>
       </section>
 
       <section class="cards" aria-label="Summary metrics">
@@ -49,6 +53,9 @@
         <h2>Price History</h2>
         <div class="chart-wrap">
           <canvas id="price-chart"></canvas>
+          <div id="chart-loading" class="chart-loading" hidden>
+            <span class="spinner" aria-hidden="true"></span>
+          </div>
         </div>
       </section>
 

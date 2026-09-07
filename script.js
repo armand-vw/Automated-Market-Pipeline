@@ -12,11 +12,12 @@ let chart = null;
 
 const el = {
   select: document.getElementById("asset-select"),
-  lastUpdated: document.getElementById("last-updated"),
+  status: document.getElementById("pipeline-status"),
   latestClose: document.getElementById("latest-close"),
   dailyChange: document.getElementById("daily-change"),
   sma: document.getElementById("sma"),
   tbody: document.querySelector("#logs-table tbody"),
+  chartLoading: document.getElementById("chart-loading"),
 };
 
 // FX pairs benefit from extra precision; everything else uses 2 decimals.
@@ -37,7 +38,7 @@ function fmt(value, group) {
 
 const compact = new Intl.NumberFormat("en-US", {
   notation: "compact",
-  maximumFractionDigits: 1,
+  maximumFractionDigits: 2,
 });
 
 const sign = (n) => (n > 0 ? "+" : "");
@@ -48,6 +49,42 @@ function fmtPct(n) {
 
 function fmtVolume(n) {
   return n === null || n === undefined ? "—" : compact.format(n);
+}
+
+function formatUtc(iso) {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "—";
+  const pad = (n) => String(n).padStart(2, "0");
+  return (
+    `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ` +
+    `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())} UTC`
+  );
+}
+
+function setPipelineStatus(state, text) {
+  el.status.dataset.state = state;
+  el.status.textContent = text;
+}
+
+function showSkeleton() {
+  el.chartLoading.hidden = false;
+  [el.latestClose, el.dailyChange, el.sma].forEach((node) => {
+    node.innerHTML =
+      '<span class="skeleton" style="display:inline-block;width:60%;height:1.4rem;vertical-align:middle;"></span>';
+  });
+  el.tbody.innerHTML = Array.from({ length: 8 })
+    .map(
+      () =>
+        '<tr><td colspan="7"><div class="skeleton" style="height:14px;margin:6px 0;"></div></td></tr>'
+    )
+    .join("");
+}
+
+function clearSkeleton() {
+  el.chartLoading.hidden = true;
+  [el.latestClose, el.dailyChange, el.sma].forEach((node) => {
+    node.textContent = "—";
+  });
 }
 
 function smaKey(record) {
@@ -208,36 +245,56 @@ function renderTickers() {
   });
 }
 
+let chartLoadingTimer = null;
+
+function showChartLoading() {
+  el.chartLoading.hidden = false;
+  if (chartLoadingTimer) clearTimeout(chartLoadingTimer);
+  chartLoadingTimer = setTimeout(() => {
+    el.chartLoading.hidden = true;
+  }, 250);
+}
+
 function update() {
   const ticker = el.select.value;
   const block = getBlock(ticker);
   if (!block) return;
+  showChartLoading();
   renderSummary(block);
   renderTable(block);
   renderChart(block);
 }
 
 async function init() {
+  showSkeleton();
   try {
     const res = await fetch(DATA_URL);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     marketData = await res.json();
 
-    if (marketData.generated_at) {
-      el.lastUpdated.textContent = `Last updated: ${new Date(
-        marketData.generated_at
-      ).toLocaleString()}`;
-    }
-
     renderTickers();
     el.select.addEventListener("change", update);
 
+    if (marketData.generated_at) {
+      setPipelineStatus(
+        "live",
+        `Pipeline Live — Last Sync: ${formatUtc(marketData.generated_at)}`
+      );
+    } else {
+      setPipelineStatus("pending", "Awaiting first run");
+    }
+
     if ((marketData.data || []).length > 0) {
       update();
+    } else {
+      clearSkeleton();
+      el.tbody.innerHTML =
+        '<tr><td colspan="7" class="empty-state">No records available</td></tr>';
     }
   } catch (err) {
     console.error("Failed to load market data:", err);
-    el.lastUpdated.textContent = "Failed to load data. Run the pipeline first.";
+    setPipelineStatus("error", "Pipeline unavailable");
+    clearSkeleton();
     el.tbody.innerHTML =
       '<tr><td colspan="7" class="empty-state">Unable to load market data</td></tr>';
   }
