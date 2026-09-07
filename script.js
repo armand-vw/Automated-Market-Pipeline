@@ -4,6 +4,9 @@
 
 const DATA_URL = "./data/market_data.json";
 
+// Dropdown group display order.
+const GROUP_ORDER = ["Equities", "Indices", "FX"];
+
 let marketData = null;
 let chart = null;
 
@@ -16,10 +19,21 @@ const el = {
   tbody: document.querySelector("#logs-table tbody"),
 };
 
-const money = new Intl.NumberFormat("en-US", {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-});
+// FX pairs benefit from extra precision; everything else uses 2 decimals.
+const DECIMALS = { FX: 4 };
+
+function decimalsFor(group) {
+  return DECIMALS[group] ?? 2;
+}
+
+function fmt(value, group) {
+  if (value === null || value === undefined) return "—";
+  const dp = decimalsFor(group);
+  return new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: dp,
+    maximumFractionDigits: dp,
+  }).format(value);
+}
 
 const compact = new Intl.NumberFormat("en-US", {
   notation: "compact",
@@ -28,12 +42,12 @@ const compact = new Intl.NumberFormat("en-US", {
 
 const sign = (n) => (n > 0 ? "+" : "");
 
-function fmt(n) {
-  return n === null || n === undefined ? "—" : money.format(n);
-}
-
 function fmtPct(n) {
   return n === null || n === undefined ? "—" : `${sign(n)}${n.toFixed(2)}%`;
+}
+
+function fmtVolume(n) {
+  return n === null || n === undefined ? "—" : compact.format(n);
 }
 
 function smaKey(record) {
@@ -54,13 +68,13 @@ function renderSummary(block) {
   const records = block.records || [];
   const latest = records[records.length - 1];
 
-  setMetric(el.latestClose, fmt(latest && latest.close));
+  setMetric(el.latestClose, fmt(latest && latest.close, block.group));
 
   const change = latest && latest.daily_return_pct;
   setMetric(el.dailyChange, fmtPct(change), change > 0 ? "positive" : "negative");
 
   const sma = latest && smaKey(latest) ? latest[smaKey(latest)] : null;
-  setMetric(el.sma, fmt(sma));
+  setMetric(el.sma, fmt(sma, block.group));
 }
 
 function renderTable(block) {
@@ -74,19 +88,17 @@ function renderTable(block) {
   }
 
   rows.forEach((r) => {
-    const key = smaKey(r);
-    const tr = document.createElement("tr");
-
     const ret = r.daily_return_pct;
     const retTd = `<td class="${ret > 0 ? "positive" : ret < 0 ? "negative" : ""}">${fmtPct(ret)}</td>`;
 
+    const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${r.date}</td>
-      <td>${fmt(r.open)}</td>
-      <td>${fmt(r.high)}</td>
-      <td>${fmt(r.low)}</td>
-      <td>${fmt(r.close)}</td>
-      <td>${r.volume === null || r.volume === undefined ? "—" : compact.format(r.volume)}</td>
+      <td>${fmt(r.open, block.group)}</td>
+      <td>${fmt(r.high, block.group)}</td>
+      <td>${fmt(r.low, block.group)}</td>
+      <td>${fmt(r.close, block.group)}</td>
+      <td>${fmtVolume(r.volume)}</td>
       ${retTd}
     `;
     el.tbody.appendChild(tr);
@@ -101,7 +113,7 @@ function renderChart(block) {
 
   const datasets = [
     {
-      label: `${block.ticker} Close`,
+      label: `${block.label} Close`,
       data: close,
       borderColor: "#58a6ff",
       backgroundColor: "rgba(88, 166, 255, 0.08)",
@@ -155,19 +167,44 @@ function renderChart(block) {
 }
 
 function renderTickers() {
-  const tickers = marketData.tickers || [];
+  const data = marketData.data || [];
   el.select.innerHTML = "";
 
-  if (tickers.length === 0) {
+  if (data.length === 0) {
     el.select.innerHTML = '<option value="">No data available</option>';
     return;
   }
 
-  tickers.forEach((t) => {
-    const opt = document.createElement("option");
-    opt.value = t;
-    opt.textContent = t;
-    el.select.appendChild(opt);
+  const groups = {};
+  data.forEach((b) => {
+    (groups[b.group] = groups[b.group] || []).push(b);
+  });
+
+  GROUP_ORDER.forEach((name) => {
+    if (!groups[name]) return;
+    const optgroup = document.createElement("optgroup");
+    optgroup.label = name;
+    groups[name].forEach((b) => {
+      const opt = document.createElement("option");
+      opt.value = b.ticker;
+      opt.textContent = b.label;
+      optgroup.appendChild(opt);
+    });
+    el.select.appendChild(optgroup);
+  });
+
+  // Any asset with an unknown group is appended last.
+  Object.keys(groups).forEach((name) => {
+    if (GROUP_ORDER.includes(name)) return;
+    const optgroup = document.createElement("optgroup");
+    optgroup.label = name;
+    groups[name].forEach((b) => {
+      const opt = document.createElement("option");
+      opt.value = b.ticker;
+      opt.textContent = b.label;
+      optgroup.appendChild(opt);
+    });
+    el.select.appendChild(optgroup);
   });
 }
 
@@ -195,7 +232,7 @@ async function init() {
     renderTickers();
     el.select.addEventListener("change", update);
 
-    if (marketData.tickers && marketData.tickers.length > 0) {
+    if ((marketData.data || []).length > 0) {
       update();
     }
   } catch (err) {

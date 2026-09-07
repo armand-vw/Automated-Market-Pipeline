@@ -7,7 +7,7 @@ from typing import Any, Dict, List
 
 import requests
 
-from src.config import ALERT_THRESHOLD, DISCORD_WEBHOOK_ENV
+from src.config import ALERT_THRESHOLD, DISCORD_WEBHOOK_ENV, TICKER_LABELS
 from src.processor import load_payload
 
 logger = logging.getLogger(__name__)
@@ -39,21 +39,22 @@ def check_and_notify() -> List[str]:
 
     for block in payload.get("data", []):
         ticker = block.get("ticker")
+        label = block.get("label") or TICKER_LABELS.get(ticker, ticker)
         ret = _latest_return(block.get("records", []))
         if ret is None or ret > ALERT_THRESHOLD:
             continue
-        _send_alert(webhook_url, ticker, ret)
+        _send_alert(webhook_url, ticker, label, ret)
         triggered.append(ticker)
 
     return triggered
 
 
-def _send_alert(webhook_url: str, ticker: str, ret: float) -> None:
+def _send_alert(webhook_url: str, ticker: str, label: str, ret: float) -> None:
     """POST a rich Discord embed alert to the configured webhook."""
     embed = {
-        "title": f"Market Alert: {ticker}",
+        "title": f"Market Alert: {label}",
         "description": (
-            f"{ticker} fell {ret:.2f}% in the latest session, "
+            f"{label} ({ticker}) fell {ret:.2f}% in the latest session, "
             f"crossing the {ALERT_THRESHOLD}% threshold."
         ),
         "color": 0xED4245,

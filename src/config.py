@@ -4,8 +4,38 @@ Edit these constants to change pipeline behaviour without touching any
 processing or notification logic.
 """
 
-# Tickers to fetch (equities and forex pairs supported by yfinance).
-TICKERS = ["MSFT", "AMZN", "USDZAR=X"]
+# Tickers to fetch (equities, indices and forex pairs supported by yfinance).
+TICKERS = [
+    "MSFT",
+    "AMZN",
+    "^GSPC",
+    "^IXIC",
+    "^NDX",
+    "^DJI",
+    "USDZAR=X",
+]
+
+# Friendly display names shown on the dashboard and in Discord alerts.
+TICKER_LABELS = {
+    "MSFT": "Microsoft",
+    "AMZN": "Amazon",
+    "^GSPC": "S&P 500",
+    "^IXIC": "NASDAQ Composite",
+    "^NDX": "NASDAQ-100",
+    "^DJI": "Dow Jones",
+    "USDZAR=X": "USD / ZAR",
+}
+
+# Asset categories used to group the dashboard dropdown and formatting.
+TICKER_GROUPS = {
+    "MSFT": "Equities",
+    "AMZN": "Equities",
+    "^GSPC": "Indices",
+    "^IXIC": "Indices",
+    "^NDX": "Indices",
+    "^DJI": "Indices",
+    "USDZAR=X": "FX",
+}
 
 # Number of calendar days of daily OHLCV data to fetch.
 LOOKBACK_DAYS = 30

@@ -10,10 +10,10 @@ A serverless, decoupled market data pipeline and analytics dashboard. A Python E
 
 ## Features
 
-- **Nightly ETL** — fetches 30 days of OHLCV data for `MSFT`, `AMZN`, and `USDZAR=X` via `yfinance`.
+- **Nightly ETL** — fetches 30 days of OHLCV data for equities (`MSFT`, `AMZN`), major US indices (`^GSPC`, `^IXIC`, `^NDX`, `^DJI`), and FX (`USDZAR=X`) via `yfinance`.
 - **Indicators** — computes a 7-day simple moving average and daily percentage change.
-- **Discord alerts** — posts a rich embed when a ticker's daily return falls at or below `-2.5%`.
-- **Interactive dashboard** — metric cards, an asset selector, a Chart.js line chart, and a historical logs table.
+- **Discord alerts** — posts a rich embed when an asset's daily return falls at or below `-2.5%`.
+- **Interactive dashboard** — metric cards, a grouped asset selector, a Chart.js line chart, and a historical logs table.
 
 ## Architecture
 
@@ -67,7 +67,9 @@ All tunable settings live in [`src/config.py`](src/config.py):
 
 | Constant           | Default            | Purpose                                   |
 | ------------------ | ------------------ | ----------------------------------------- |
-| `TICKERS`          | `MSFT, AMZN, USDZAR=X` | Assets to fetch                      |
+| `TICKERS`          | `MSFT, AMZN, ^GSPC, ^IXIC, ^NDX, ^DJI, USDZAR=X` | Assets to fetch        |
+| `TICKER_LABELS`    | friendly names     | Display names for the dashboard & alerts  |
+| `TICKER_GROUPS`    | `Equities/Indices/FX` | Category used to group the selector   |
 | `LOOKBACK_DAYS`    | `30`               | Days of history to fetch                  |
 | `SMA_WINDOW`       | `7`                | Simple moving average window              |
 | `ALERT_THRESHOLD`  | `-2.5`             | Daily return that triggers a Discord alert|

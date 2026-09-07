@@ -7,7 +7,7 @@ from typing import Any, Dict, List
 
 import pandas as pd
 
-from src.config import OUTPUT_PATH, SMA_WINDOW
+from src.config import OUTPUT_PATH, SMA_WINDOW, TICKER_GROUPS, TICKER_LABELS
 
 logger = logging.getLogger(__name__)
 
@@ -126,7 +126,14 @@ def process_all(raw: Dict[str, pd.DataFrame]) -> Dict[str, Any]:
                 )
 
             payload["tickers"].append(ticker)
-            payload["data"].append({"ticker": ticker, "records": records})
+            payload["data"].append(
+                {
+                    "ticker": ticker,
+                    "label": TICKER_LABELS.get(ticker, ticker),
+                    "group": TICKER_GROUPS.get(ticker, "Other"),
+                    "records": records,
+                }
+            )
             logger.info("Processed %d records for %s", len(records), ticker)
         except Exception as exc:  # noqa: BLE001
             logger.warning("Skipping %s: %s", ticker, exc)

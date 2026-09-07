@@ -96,6 +96,16 @@ main.container {
   border-color: var(--accent);
 }
 
+.toolbar optgroup {
+  color: var(--text-muted);
+  font-style: normal;
+}
+
+.toolbar option {
+  color: var(--text);
+  background: var(--bg-elevated);
+}
+
 .muted {
   color: var(--text-muted);
   font-size: 0.85rem;
