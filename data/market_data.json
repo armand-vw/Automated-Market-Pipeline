@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-07T22:36:48.036578+00:00",
+  "generated_at": "2026-09-08T03:53:03.979449+00:00",
   "tickers": [
     "MSFT",
     "AMZN",
@@ -4297,6 +4297,16 @@
           "volume": 0,
           "sma_7d": 116512.5848,
           "daily_return_pct": 0.0326
+        },
+        {
+          "date": "2026-09-07",
+          "open": 116725.7969,
+          "high": 117184.7031,
+          "low": 116464.7031,
+          "close": 116989.0,
+          "volume": 0,
+          "sma_7d": 116538.6987,
+          "daily_return_pct": 0.2255
         }
       ]
     },
@@ -4306,16 +4316,6 @@
       "group": "FX",
       "records": [
         {
-          "date": "2026-07-28",
-          "open": 16.7789,
-          "high": 16.8211,
-          "low": 16.6462,
-          "close": 16.7786,
-          "volume": 0,
-          "sma_7d": null,
-          "daily_return_pct": null
-        },
-        {
           "date": "2026-07-29",
           "open": 16.7048,
           "high": 16.7963,
@@ -4323,7 +4323,7 @@
           "close": 16.702,
           "volume": 0,
           "sma_7d": null,
-          "daily_return_pct": -0.4562
+          "daily_return_pct": null
         },
         {
           "date": "2026-07-30",
@@ -4372,7 +4372,7 @@
           "low": 16.2923,
           "close": 16.3827,
           "volume": 0,
-          "sma_7d": 16.5722,
+          "sma_7d": null,
           "daily_return_pct": -0.8491
         },
         {
@@ -4597,13 +4597,23 @@
         },
         {
           "date": "2026-09-07",
-          "open": 15.9799,
-          "high": 15.9975,
-          "low": 15.9736,
-          "close": 15.9843,
+          "open": 15.9556,
+          "high": 16.0019,
+          "low": 15.9317,
+          "close": 15.9601,
           "volume": 0,
-          "sma_7d": 16.0618,
-          "daily_return_pct": 0.0426
+          "sma_7d": 16.0584,
+          "daily_return_pct": -0.1087
+        },
+        {
+          "date": "2026-09-08",
+          "open": 15.9799,
+          "high": 16.005,
+          "low": 15.9678,
+          "close": 15.9923,
+          "volume": 0,
+          "sma_7d": 16.0585,
+          "daily_return_pct": 0.2018
         }
       ]
     },
@@ -4613,16 +4623,6 @@
       "group": "FX",
       "records": [
         {
-          "date": "2026-07-28",
-          "open": 1.1369,
-          "high": 1.1402,
-          "low": 1.1354,
-          "close": 1.1369,
-          "volume": 0,
-          "sma_7d": null,
-          "daily_return_pct": null
-        },
-        {
           "date": "2026-07-29",
           "open": 1.1384,
           "high": 1.1405,
@@ -4630,7 +4630,7 @@
           "close": 1.1387,
           "volume": 0,
           "sma_7d": null,
-          "daily_return_pct": 0.1503
+          "daily_return_pct": null
         },
         {
           "date": "2026-07-30",
@@ -4679,7 +4679,7 @@
           "low": 1.1528,
           "close": 1.1532,
           "volume": 0,
-          "sma_7d": 1.1476,
+          "sma_7d": null,
           "daily_return_pct": 0.218
         },
         {
@@ -4904,13 +4904,23 @@
         },
         {
           "date": "2026-09-07",
-          "open": 1.1628,
-          "high": 1.1629,
-          "low": 1.1627,
-          "close": 1.1629,
+          "open": 1.1614,
+          "high": 1.1635,
+          "low": 1.1608,
+          "close": 1.1614,
           "volume": 0,
-          "sma_7d": 1.1614,
-          "daily_return_pct": 0.0081
+          "sma_7d": 1.1612,
+          "daily_return_pct": -0.1231
+        },
+        {
+          "date": "2026-09-08",
+          "open": 1.1628,
+          "high": 1.1637,
+          "low": 1.1627,
+          "close": 1.1628,
+          "volume": 0,
+          "sma_7d": 1.1608,
+          "daily_return_pct": 0.1198
         }
       ]
     },
@@ -4920,16 +4930,6 @@
       "group": "FX",
       "records": [
         {
-          "date": "2026-07-28",
-          "open": 22.2987,
-          "high": 22.3512,
-          "low": 22.1541,
-          "close": 22.2977,
-          "volume": 0,
-          "sma_7d": null,
-          "daily_return_pct": null
-        },
-        {
           "date": "2026-07-29",
           "open": 22.1867,
           "high": 22.3218,
@@ -4937,7 +4937,7 @@
           "close": 22.1905,
           "volume": 0,
           "sma_7d": null,
-          "daily_return_pct": -0.4808
+          "daily_return_pct": null
         },
         {
           "date": "2026-07-30",
@@ -4986,7 +4986,7 @@
           "low": 21.955,
           "close": 22.0359,
           "volume": 0,
-          "sma_7d": 22.1991,
+          "sma_7d": null,
           "daily_return_pct": -0.6724
         },
         {
@@ -5211,13 +5211,13 @@
         },
         {
           "date": "2026-09-07",
-          "open": 21.6154,
-          "high": 21.6559,
-          "low": 21.6138,
-          "close": 21.6484,
+          "open": 21.5684,
+          "high": 21.6661,
+          "low": 21.5515,
+          "close": 21.5735,
           "volume": 0,
-          "sma_7d": 21.7471,
-          "daily_return_pct": 0.0866
+          "sma_7d": 21.7364,
+          "daily_return_pct": -0.26
         }
       ]
     },
@@ -5479,12 +5479,12 @@
         {
           "date": "2026-09-07",
           "open": 4466.5,
-          "high": 4481.2998,
+          "high": 4486.0,
           "low": 4426.2002,
-          "close": 4455.7998,
-          "volume": 71061,
-          "sma_7d": 4428.6857,
-          "daily_return_pct": 0.5869
+          "close": 4478.1001,
+          "volume": 90479,
+          "sma_7d": 4431.8714,
+          "daily_return_pct": 1.0903
         }
       ]
     },
@@ -5748,10 +5748,10 @@
           "open": 92.26,
           "high": 93.29,
           "low": 90.87,
-          "close": 92.67,
-          "volume": 99199,
-          "sma_7d": 89.4057,
-          "daily_return_pct": 1.3008
+          "close": 92.96,
+          "volume": 110567,
+          "sma_7d": 89.4471,
+          "daily_return_pct": 1.6178
         }
       ]
     }
