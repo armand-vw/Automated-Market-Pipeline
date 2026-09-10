@@ -2,18 +2,17 @@
 
 import logging
 import os
-from datetime import datetime, timezone
-from typing import Any, Dict, List
+from datetime import UTC, datetime
+from typing import Any
 
 import requests
 
-from src.config import ALERT_THRESHOLD, DISCORD_WEBHOOK_ENV, TICKER_LABELS
-from src.processor import load_payload
+from src.config import ALERT_THRESHOLD, DISCORD_WEBHOOK_ENV
 
 logger = logging.getLogger(__name__)
 
 
-def _latest_return(records: List[Dict[str, Any]]) -> float | None:
+def _latest_return(records: list[dict[str, Any]]) -> float | None:
     """Return the most recent daily return, or None when unavailable."""
     if not records:
         return None
@@ -23,30 +22,41 @@ def _latest_return(records: List[Dict[str, Any]]) -> float | None:
     return float(value)
 
 
-def check_and_notify() -> List[str]:
-    """Evaluate latest daily returns and alert on threshold breaches.
+def check_and_notify(data_blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Evaluate latest daily returns and record any threshold breaches.
 
-    Fails gracefully (no-op) when the webhook environment variable is
-    missing or empty, so local runs never crash on missing secrets.
+    Always returns the list of triggered alerts (used for the dashboard's
+    alert history). A Discord webhook is only sent when the environment
+    variable is set, so local runs never crash on missing secrets.
     """
     webhook_url = os.getenv(DISCORD_WEBHOOK_ENV, "").strip()
     if not webhook_url:
-        logger.info("No %s set; skipping Discord alerts.", DISCORD_WEBHOOK_ENV)
-        return []
+        logger.info("No %s set; recording alerts locally only.", DISCORD_WEBHOOK_ENV)
 
-    payload = load_payload()
-    triggered: List[str] = []
+    alerts: list[dict[str, Any]] = []
 
-    for block in payload.get("data", []):
+    for block in data_blocks:
         ticker = block.get("ticker")
-        label = block.get("label") or TICKER_LABELS.get(ticker, ticker)
-        ret = _latest_return(block.get("records", []))
+        label = block.get("label") or ticker
+        records = block.get("records", [])
+        ret = _latest_return(records)
         if ret is None or ret > ALERT_THRESHOLD:
             continue
-        _send_alert(webhook_url, ticker, label, ret)
-        triggered.append(ticker)
 
-    return triggered
+        alert = {
+            "ticker": ticker,
+            "label": label,
+            "daily_return_pct": ret,
+            "date": records[-1].get("date"),
+            "triggered_at": datetime.now(UTC).isoformat(),
+        }
+        alerts.append(alert)
+        logger.info("Threshold breach: %s (%.2f%%)", ticker, ret)
+
+        if webhook_url:
+            _send_alert(webhook_url, ticker, label, ret)
+
+    return alerts
 
 
 def _send_alert(webhook_url: str, ticker: str, label: str, ret: float) -> None:
@@ -63,7 +73,7 @@ def _send_alert(webhook_url: str, ticker: str, label: str, ret: float) -> None:
             {"name": "Daily Return", "value": f"{ret:.2f}%", "inline": True},
             {"name": "Threshold", "value": f"{ALERT_THRESHOLD}%", "inline": True},
         ],
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
     }
 
     try:

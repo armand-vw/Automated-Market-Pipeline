@@ -2,12 +2,20 @@
 
 import json
 import logging
-from datetime import datetime, timezone
-from typing import Any, Dict, List
+from datetime import UTC, datetime
+from typing import Any
 
 import pandas as pd
 
-from src.config import OUTPUT_PATH, SMA_WINDOW, TICKER_GROUPS, TICKER_LABELS
+from src.config import (
+    OUTPUT_PATH,
+    SMA_WINDOW,
+    STALENESS_DAYS,
+    TICKER_DECIMALS,
+    TICKER_GROUPS,
+    TICKER_LABELS,
+)
+from src.indicators import compute_indicators
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +28,8 @@ COLUMN_MAP = {
     "adj close": "close",
     "volume": "volume",
 }
+
+BASE_COLS = ["date", "open", "high", "low", "close", "volume"]
 
 
 def _flatten_columns(df: pd.DataFrame) -> pd.DataFrame:
@@ -68,12 +78,11 @@ def clean_frame(df: pd.DataFrame) -> pd.DataFrame:
         raise ValueError("No date column found in frame")
     df = df.rename(columns={date_col: "date"})
 
-    keep = ["date", "open", "high", "low", "close", "volume"]
-    missing = [c for c in keep if c not in df.columns]
+    missing = [c for c in BASE_COLS if c not in df.columns]
     if missing:
         raise ValueError(f"Missing columns: {missing}")
 
-    df = df[keep]
+    df = df[BASE_COLS]
     df["date"] = pd.to_datetime(df["date"], utc=True).dt.strftime("%Y-%m-%d")
 
     for col in ("open", "high", "low", "close", "volume"):
@@ -85,71 +94,100 @@ def clean_frame(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def compute_indicators(df: pd.DataFrame) -> pd.DataFrame:
-    """Add a simple moving average and daily percentage change."""
-    df = df.copy()
-    sma_col = f"sma_{SMA_WINDOW}d"
-    df[sma_col] = df["close"].rolling(
-        window=SMA_WINDOW, min_periods=SMA_WINDOW
-    ).mean()
-    df["daily_return_pct"] = df["close"].pct_change() * 100.0
-    return df
+def _summarize(df: pd.DataFrame) -> dict[str, Any]:
+    """Extract headline metrics from the latest row of an enriched frame."""
+    if df.empty:
+        return {}
+    last = df.iloc[-1]
 
+    def value(col: str) -> float | None:
+        return _round(last[col]) if col in df.columns else None
 
-def process_all(raw: Dict[str, pd.DataFrame]) -> Dict[str, Any]:
-    """Clean, enrich and persist every ticker frame to a single JSON file."""
-    sma_col = f"sma_{SMA_WINDOW}d"
-    payload: Dict[str, Any] = {
-        "generated_at": datetime.now(timezone.utc).isoformat(),
-        "tickers": [],
-        "data": [],
+    return {
+        "latest_date": last["date"],
+        "latest_close": value("close"),
+        "daily_return_pct": value("daily_return_pct"),
+        "sma": value(f"sma_{SMA_WINDOW}d"),
+        "rsi_14": value("rsi_14"),
+        "high_52w": value("high_52w"),
+        "low_52w": value("low_52w"),
+        "volatility_20d": value("volatility_20d"),
     }
+
+
+def _is_stale(data_blocks: list[dict[str, Any]]) -> bool:
+    """True when the newest observation across all assets is too old."""
+    dates = [
+        b["summary"]["latest_date"]
+        for b in data_blocks
+        if b.get("summary", {}).get("latest_date")
+    ]
+    if not dates:
+        return True
+    latest = max(dates)
+    latest_dt = datetime.fromisoformat(latest).replace(tzinfo=UTC)
+    age_days = (datetime.now(UTC) - latest_dt).days
+    return age_days > STALENESS_DAYS
+
+
+def build_payload(raw: dict[str, pd.DataFrame]) -> dict[str, Any]:
+    """Clean, enrich and summarise every ticker frame into a payload dict."""
+    data_blocks: list[dict[str, Any]] = []
+    tickers: list[str] = []
 
     for ticker, frame in raw.items():
         try:
             cleaned = clean_frame(frame)
-            enriched = compute_indicators(cleaned)
+            enriched = compute_indicators(cleaned, SMA_WINDOW)
 
-            records: List[Dict[str, Any]] = []
+            extra_cols = [c for c in enriched.columns if c not in BASE_COLS]
+            records: list[dict[str, Any]] = []
             for _, row in enriched.iterrows():
-                records.append(
-                    {
-                        "date": row["date"],
-                        "open": _round(row["open"]),
-                        "high": _round(row["high"]),
-                        "low": _round(row["low"]),
-                        "close": _round(row["close"]),
-                        "volume": _round_int(row["volume"]),
-                        sma_col: _round(row[sma_col]),
-                        "daily_return_pct": _round(row["daily_return_pct"]),
-                    }
-                )
+                record: dict[str, Any] = {
+                    "date": row["date"],
+                    "open": _round(row["open"]),
+                    "high": _round(row["high"]),
+                    "low": _round(row["low"]),
+                    "close": _round(row["close"]),
+                    "volume": _round_int(row["volume"]),
+                }
+                for col in extra_cols:
+                    record[col] = _round(row[col])
+                records.append(record)
 
-            payload["tickers"].append(ticker)
-            payload["data"].append(
+            data_blocks.append(
                 {
                     "ticker": ticker,
                     "label": TICKER_LABELS.get(ticker, ticker),
                     "group": TICKER_GROUPS.get(ticker, "Other"),
+                    "decimals": TICKER_DECIMALS.get(ticker, 2),
+                    "summary": _summarize(enriched),
                     "records": records,
                 }
             )
+            tickers.append(ticker)
             logger.info("Processed %d records for %s", len(records), ticker)
         except Exception as exc:  # noqa: BLE001
             logger.warning("Skipping %s: %s", ticker, exc)
 
-    write_json(payload)
-    return payload
+    return {
+        "generated_at": datetime.now(UTC).isoformat(),
+        "is_stale": _is_stale(data_blocks),
+        "tickers": tickers,
+        "pipeline_meta": {},
+        "alerts": [],
+        "data": data_blocks,
+    }
 
 
-def write_json(payload: Dict[str, Any]) -> None:
+def write_json(payload: dict[str, Any]) -> None:
     """Persist the payload to disk as pretty-printed JSON."""
     with open(OUTPUT_PATH, "w", encoding="utf-8") as handle:
         json.dump(payload, handle, indent=2)
     logger.info("Wrote %d ticker(s) to %s", len(payload["data"]), OUTPUT_PATH)
 
 
-def load_payload() -> Dict[str, Any]:
+def load_payload() -> dict[str, Any]:
     """Read the persisted dataset back into memory."""
-    with open(OUTPUT_PATH, "r", encoding="utf-8") as handle:
+    with open(OUTPUT_PATH, encoding="utf-8") as handle:
         return json.load(handle)

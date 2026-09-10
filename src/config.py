@@ -1,94 +1,31 @@
-"""Central configuration for the automated market pipeline.
+"""Configuration loader.
 
-Edit these constants to change pipeline behaviour without touching any
-processing or notification logic.
+All tunable settings live in ``config.json`` at the repository root. This
+module loads that file once and exposes convenient constants for the rest of
+the pipeline. Secrets (such as the Discord webhook URL) remain environment
+variables and are never committed.
 """
 
-# Tickers to fetch (equities, indices, forex and commodities supported by
-# yfinance).
-TICKERS = [
-    # Equities — global top 10 by market cap.
-    "MSFT",
-    "AMZN",
-    "NVDA",
-    "AAPL",
-    "GOOGL",
-    "META",
-    "AVGO",
-    "BRK-B",
-    "TSM",
-    "LLY",
-    "2222.SR",
-    # Indices — broad market health (global & local).
-    "^GSPC",
-    "^IXIC",
-    "^J203.JO",
-    # Forex — key currency pairs.
-    "USDZAR=X",
-    "EURUSD=X",
-    "GBPZAR=X",
-    # Commodities — inflation & industrial indicators.
-    "GC=F",
-    "CL=F",
-]
+import json
+from pathlib import Path
+from typing import Any
 
-# Friendly display names shown on the dashboard and in Discord alerts.
-TICKER_LABELS = {
-    "MSFT": "Microsoft",
-    "AMZN": "Amazon",
-    "NVDA": "NVIDIA",
-    "AAPL": "Apple",
-    "GOOGL": "Alphabet",
-    "META": "Meta",
-    "AVGO": "Broadcom",
-    "BRK-B": "Berkshire Hathaway",
-    "TSM": "TSMC",
-    "LLY": "Eli Lilly",
-    "2222.SR": "Saudi Aramco",
-    "^GSPC": "S&P 500",
-    "^IXIC": "NASDAQ Composite",
-    "^J203.JO": "JSE Top 40",
-    "USDZAR=X": "USD / ZAR",
-    "EURUSD=X": "EUR / USD",
-    "GBPZAR=X": "GBP / ZAR",
-    "GC=F": "Gold Futures",
-    "CL=F": "WTI Crude Oil",
-}
+_CONFIG_PATH = Path(__file__).resolve().parent.parent / "config.json"
 
-# Asset categories used to group the dashboard dropdown and formatting.
-TICKER_GROUPS = {
-    "MSFT": "Equities",
-    "AMZN": "Equities",
-    "NVDA": "Equities",
-    "AAPL": "Equities",
-    "GOOGL": "Equities",
-    "META": "Equities",
-    "AVGO": "Equities",
-    "BRK-B": "Equities",
-    "TSM": "Equities",
-    "LLY": "Equities",
-    "2222.SR": "Equities",
-    "^GSPC": "Indices",
-    "^IXIC": "Indices",
-    "^J203.JO": "Indices",
-    "USDZAR=X": "FX",
-    "EURUSD=X": "FX",
-    "GBPZAR=X": "FX",
-    "GC=F": "Commodities",
-    "CL=F": "Commodities",
-}
+with _CONFIG_PATH.open("r", encoding="utf-8") as _handle:
+    _CONFIG: dict[str, Any] = json.load(_handle)
 
-# Number of calendar days of daily OHLCV data to fetch.
-LOOKBACK_DAYS = 30
+LOOKBACK_DAYS = int(_CONFIG.get("lookback_days", 365))
+SMA_WINDOW = int(_CONFIG.get("sma_window", 7))
+ALERT_THRESHOLD = float(_CONFIG.get("alert_threshold", -2.5))
+STALENESS_DAYS = int(_CONFIG.get("staleness_days", 5))
+MAX_ALERTS = int(_CONFIG.get("max_alerts", 50))
+OUTPUT_PATH = _CONFIG.get("output_path", "data/market_data.json")
+DISCORD_WEBHOOK_ENV = _CONFIG.get("discord_webhook_env", "DISCORD_WEBHOOK_URL")
 
-# Simple moving average window (in trading days).
-SMA_WINDOW = 7
+_ASSETS: list[dict[str, Any]] = _CONFIG.get("assets", [])
 
-# Daily return (percent) at or below which a Discord alert fires.
-ALERT_THRESHOLD = -2.5
-
-# Where the processed dataset is written (served by GitHub Pages).
-OUTPUT_PATH = "data/market_data.json"
-
-# Environment variable that holds the Discord webhook URL.
-DISCORD_WEBHOOK_ENV = "DISCORD_WEBHOOK_URL"
+TICKERS: list[str] = [a["ticker"] for a in _ASSETS]
+TICKER_LABELS: dict[str, str] = {a["ticker"]: a.get("label", a["ticker"]) for a in _ASSETS}
+TICKER_GROUPS: dict[str, str] = {a["ticker"]: a.get("group", "Other") for a in _ASSETS}
+TICKER_DECIMALS: dict[str, int] = {a["ticker"]: int(a.get("decimals", 2)) for a in _ASSETS}

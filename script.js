@@ -1,35 +1,77 @@
 // Automated Market Pipeline dashboard.
-// Loads the generated dataset using a *relative* path so the app works from
-// the GitHub Pages project subpath (https://user.github.io/repo/...).
+// Loads the generated dataset via a relative path so it works on GitHub Pages
+// project subpaths. Charts are rendered with TradingView Lightweight Charts.
 
 const DATA_URL = "./data/market_data.json";
 
-// Dropdown group display order.
-const GROUP_ORDER = ["Equities", "Indices", "FX", "Commodities"];
+const GROUP_ORDER = ["Equities", "Indices", "FX", "Commodities", "Crypto"];
+
+const THEME_COLORS = {
+  dark: {
+    text: "#e6edf3",
+    muted: "#8b949e",
+    grid: "rgba(48, 54, 61, 0.5)",
+    up: "#3fb950",
+    down: "#f85149",
+    accent: "#58a6ff",
+    orange: "#f0883e",
+    purple: "#bc8cff",
+  },
+  light: {
+    text: "#24292f",
+    muted: "#57606a",
+    grid: "rgba(208, 215, 222, 0.5)",
+    up: "#1a7f37",
+    down: "#cf222e",
+    accent: "#0969da",
+    orange: "#bc4c00",
+    purple: "#8250df",
+  },
+};
 
 let marketData = null;
 let chart = null;
+let sortKey = "daily_return_pct";
+let sortDir = "desc";
+
+const state = {
+  ticker: null,
+  timeframe: "30D",
+  chartType: "line",
+  indicators: { ema20: false, ema50: false, bollinger: false, rsi: false },
+  compare: false,
+  compareTicker: null,
+  theme: "dark",
+};
 
 const el = {
   select: document.getElementById("asset-select"),
+  compareToggle: document.getElementById("compare-toggle"),
+  compareSelect: document.getElementById("compare-select"),
+  themeToggle: document.getElementById("theme-toggle"),
   status: document.getElementById("pipeline-status"),
   latestClose: document.getElementById("latest-close"),
   dailyChange: document.getElementById("daily-change"),
   sma: document.getElementById("sma"),
-  tbody: document.querySelector("#logs-table tbody"),
-  chartLoading: document.getElementById("chart-loading"),
+  chartContainer: document.getElementById("price-chart"),
+  leaderboardBody: document.querySelector("#leaderboard tbody"),
+  logsBody: document.querySelector("#logs-table tbody"),
+  alertTimeline: document.getElementById("alert-timeline"),
+  thresholdInput: document.getElementById("threshold-input"),
+  simulateBtn: document.getElementById("simulate-btn"),
+  simResult: document.getElementById("sim-result"),
+  exportBtn: document.getElementById("export-csv"),
+  modal: document.getElementById("health-modal"),
+  healthBody: document.getElementById("health-body"),
 };
 
-// FX pairs benefit from extra precision; everything else uses 2 decimals.
-const DECIMALS = { FX: 4 };
+/* ------------------------------------------------------------------ */
+/* Formatting helpers                                                  */
+/* ------------------------------------------------------------------ */
 
-function decimalsFor(group) {
-  return DECIMALS[group] ?? 2;
-}
-
-function fmt(value, group) {
+function fmt(value, decimals) {
   if (value === null || value === undefined) return "—";
-  const dp = decimalsFor(group);
+  const dp = decimals ?? 2;
   return new Intl.NumberFormat("en-US", {
     minimumFractionDigits: dp,
     maximumFractionDigits: dp,
@@ -41,60 +83,36 @@ const compact = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 2,
 });
 
-const sign = (n) => (n > 0 ? "+" : "");
-
 function fmtPct(n) {
-  return n === null || n === undefined ? "—" : `${sign(n)}${n.toFixed(2)}%`;
+  if (n === null || n === undefined) return "—";
+  const s = n > 0 ? "+" : "";
+  return `${s}${n.toFixed(2)}%`;
 }
 
 function fmtVolume(n) {
   return n === null || n === undefined ? "—" : compact.format(n);
 }
 
-function formatUtc(iso) {
+function parseTime(s) {
+  return Math.floor(new Date(`${s}T00:00:00Z`).getTime() / 1000);
+}
+
+function relativeTime(iso) {
   const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "—";
-  const pad = (n) => String(n).padStart(2, "0");
-  return (
-    `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ` +
-    `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())} UTC`
-  );
-}
-
-function setPipelineStatus(state, text) {
-  el.status.dataset.state = state;
-  el.status.textContent = text;
-}
-
-function showSkeleton() {
-  el.chartLoading.style.display = "flex";
-  [el.latestClose, el.dailyChange, el.sma].forEach((node) => {
-    node.innerHTML =
-      '<span class="skeleton" style="display:inline-block;width:60%;height:1.4rem;vertical-align:middle;"></span>';
-  });
-  el.tbody.innerHTML = Array.from({ length: 8 })
-    .map(
-      () =>
-        '<tr><td colspan="7"><div class="skeleton" style="height:14px;margin:6px 0;"></div></td></tr>'
-    )
-    .join("");
-}
-
-function clearSkeleton() {
-  el.chartLoading.style.display = "none";
-  [el.latestClose, el.dailyChange, el.sma].forEach((node) => {
-    if (node.querySelector(".skeleton")) {
-      node.textContent = "—";
-    }
-  });
-}
-
-function smaKey(record) {
-  return Object.keys(record).find((k) => /^sma_\d+d$/.test(k)) || null;
+  if (Number.isNaN(d.getTime())) return "unknown";
+  const s = Math.max(0, (Date.now() - d.getTime()) / 1000);
+  if (s < 60) return "just now";
+  if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+  if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+  return `${Math.floor(s / 86400)}d ago`;
 }
 
 function getBlock(ticker) {
   return (marketData.data || []).find((b) => b.ticker === ticker);
+}
+
+function color(name) {
+  return THEME_COLORS[state.theme][name] || THEME_COLORS.dark[name];
 }
 
 function setMetric(node, text, tone) {
@@ -103,174 +121,559 @@ function setMetric(node, text, tone) {
   if (tone) node.classList.add(tone);
 }
 
-function renderSummary(block) {
-  const records = block.records || [];
-  const latest = records[records.length - 1];
-
-  setMetric(el.latestClose, fmt(latest && latest.close, block.group));
-
-  const change = latest && latest.daily_return_pct;
-  setMetric(el.dailyChange, fmtPct(change), change > 0 ? "positive" : "negative");
-
-  const sma = latest && smaKey(latest) ? latest[smaKey(latest)] : null;
-  setMetric(el.sma, fmt(sma, block.group));
+function setStatus(stateName, text) {
+  el.status.dataset.state = stateName;
+  el.status.textContent = text;
 }
 
-function renderTable(block) {
-  const rows = (block.records || []).slice().reverse();
-  el.tbody.innerHTML = "";
+/* ------------------------------------------------------------------ */
+/* Timeframe filtering                                                 */
+/* ------------------------------------------------------------------ */
 
-  if (rows.length === 0) {
-    el.tbody.innerHTML =
-      '<tr><td colspan="7" class="empty-state">No records available</td></tr>';
+function filterByTimeframe(records, tf) {
+  if (!records || records.length === 0) return [];
+  if (tf === "ALL") return records;
+  const latest = new Date(`${records[records.length - 1].date}T00:00:00Z`);
+  if (tf === "YTD") {
+    const year = latest.getUTCFullYear();
+    return records.filter((r) => new Date(`${r.date}T00:00:00Z`).getUTCFullYear() === year);
+  }
+  const days = parseInt(tf, 10);
+  const cutoff = new Date(latest.getTime() - (days - 1) * 86400000);
+  return records.filter((r) => new Date(`${r.date}T00:00:00Z`) >= cutoff);
+}
+
+/* ------------------------------------------------------------------ */
+/* Summary cards                                                       */
+/* ------------------------------------------------------------------ */
+
+function renderSummary(block) {
+  const s = block.summary || {};
+  setMetric(el.latestClose, fmt(s.latest_close, block.decimals));
+  const ch = s.daily_return_pct;
+  setMetric(el.dailyChange, fmtPct(ch), ch > 0 ? "positive" : ch < 0 ? "negative" : null);
+  setMetric(el.sma, fmt(s.sma, block.decimals));
+}
+
+/* ------------------------------------------------------------------ */
+/* Leaderboard                                                         */
+/* ------------------------------------------------------------------ */
+
+function sparklineSVG(records) {
+  const closes = (records || [])
+    .map((r) => r.close)
+    .filter((v) => v !== null && v !== undefined)
+    .slice(-30);
+  if (closes.length < 2) return "";
+  const w = 80;
+  const h = 24;
+  const min = Math.min(...closes);
+  const max = Math.max(...closes);
+  const range = max - min || 1;
+  const up = closes[closes.length - 1] >= closes[0];
+  const pts = closes
+    .map((v, i) => {
+      const x = (i / (closes.length - 1)) * w;
+      const y = h - ((v - min) / range) * (h - 2) - 1;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(" ");
+  const stroke = up ? color("up") : color("down");
+  return `<svg class="sparkline" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polyline points="${pts}" fill="none" stroke="${stroke}" stroke-width="1.5"/></svg>`;
+}
+
+function renderLeaderboard() {
+  const blocks = (marketData.data || []).slice();
+  const dir = sortDir === "asc" ? 1 : -1;
+  const sortVal = (b) =>
+    sortKey === "label" ? b.label : (b.summary && b.summary[sortKey]);
+  blocks.sort((a, b) => {
+    const va = sortVal(a);
+    const vb = sortVal(b);
+    if (va == null && vb == null) return 0;
+    if (va == null) return 1;
+    if (vb == null) return -1;
+    if (typeof va === "string") return va.localeCompare(vb) * dir;
+    return (va - vb) * dir;
+  });
+
+  el.leaderboardBody.innerHTML = "";
+  blocks.forEach((b) => {
+    const s = b.summary || {};
+    const ret = s.daily_return_pct;
+    const retCls = ret > 0 ? "positive" : ret < 0 ? "negative" : "";
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${b.label}</td>
+      <td>${b.group}</td>
+      <td>${fmt(s.latest_close, b.decimals)}</td>
+      <td class="${retCls}">${fmtPct(ret)}</td>
+      <td>${fmt(s.rsi_14, 1)}</td>
+      <td>${sparklineSVG(b.records)}</td>
+    `;
+    el.leaderboardBody.appendChild(tr);
+  });
+}
+
+/* ------------------------------------------------------------------ */
+/* Historical logs table + CSV export                                  */
+/* ------------------------------------------------------------------ */
+
+function renderLogs(block) {
+  const records = filterByTimeframe(block.records, state.timeframe).slice().reverse();
+  el.logsBody.innerHTML = "";
+
+  if (records.length === 0) {
+    el.logsBody.innerHTML =
+      '<tr><td colspan="8" class="empty-state">No records available</td></tr>';
     return;
   }
 
-  rows.forEach((r) => {
+  records.forEach((r) => {
     const ret = r.daily_return_pct;
-    const retTd = `<td class="${ret > 0 ? "positive" : ret < 0 ? "negative" : ""}">${fmtPct(ret)}</td>`;
-
+    const retCls = ret > 0 ? "positive" : ret < 0 ? "negative" : "";
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${r.date}</td>
-      <td>${fmt(r.open, block.group)}</td>
-      <td>${fmt(r.high, block.group)}</td>
-      <td>${fmt(r.low, block.group)}</td>
-      <td>${fmt(r.close, block.group)}</td>
+      <td>${fmt(r.open, block.decimals)}</td>
+      <td>${fmt(r.high, block.decimals)}</td>
+      <td>${fmt(r.low, block.decimals)}</td>
+      <td>${fmt(r.close, block.decimals)}</td>
       <td>${fmtVolume(r.volume)}</td>
-      ${retTd}
+      <td class="${retCls}">${fmtPct(ret)}</td>
+      <td>${fmt(r.rsi_14, 1)}</td>
     `;
-    el.tbody.appendChild(tr);
+    el.logsBody.appendChild(tr);
   });
 }
 
-function renderChart(block) {
-  if (typeof Chart === "undefined") return;
+function exportCSV() {
+  const block = getBlock(state.ticker);
+  if (!block) return;
+  const records = filterByTimeframe(block.records, state.timeframe);
+  const header = ["date", "open", "high", "low", "close", "volume", "daily_return_pct", "rsi_14"];
+  const rows = records.map((r) => header.map((h) => (r[h] == null ? "" : r[h])).join(","));
+  const csv = [header.join(","), ...rows].join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${block.ticker}_${state.timeframe}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
-  const records = block.records || [];
-  const labels = records.map((r) => r.date);
-  const close = records.map((r) => r.close);
-  const sma = records.map((r) => (smaKey(r) ? r[smaKey(r)] : null));
+/* ------------------------------------------------------------------ */
+/* Chart (Lightweight Charts)                                          */
+/* ------------------------------------------------------------------ */
 
-  const datasets = [
-    {
-      label: `${block.label} Close`,
-      data: close,
-      borderColor: "#58a6ff",
-      backgroundColor: "rgba(88, 166, 255, 0.08)",
-      fill: true,
-      tension: 0.25,
-      pointRadius: 0,
-      borderWidth: 2,
+function chartOptions() {
+  return {
+    layout: {
+      background: { type: "solid", color: "transparent" },
+      textColor: color("text"),
+      fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
     },
-  ];
+    grid: {
+      vertLines: { color: color("grid") },
+      horzLines: { color: color("grid") },
+    },
+    rightPriceScale: { borderVisible: false },
+    timeScale: { borderVisible: false, timeVisible: false },
+    crosshair: { mode: 0 },
+  };
+}
 
-  if (sma.some((v) => v !== null)) {
-    datasets.push({
-      label: "7-Day SMA",
-      data: sma,
-      borderColor: "#f0883e",
-      backgroundColor: "rgba(240, 136, 62, 0.05)",
-      fill: false,
-      tension: 0.25,
-      pointRadius: 0,
-      borderWidth: 2,
-      borderDash: [6, 4],
+function candleData(records) {
+  return records.map((r) => ({
+    time: parseTime(r.date),
+    open: r.open,
+    high: r.high,
+    low: r.low,
+    close: r.close,
+  }));
+}
+
+function lineData(records, key) {
+  return records
+    .filter((r) => r[key] !== null && r[key] !== undefined)
+    .map((r) => ({ time: parseTime(r.date), value: r[key] }));
+}
+
+function renderNormalChart(block, records) {
+  const LWC = window.LightweightCharts;
+  chart = LWC.createChart(el.chartContainer, chartOptions());
+
+  // Main price series.
+  if (state.chartType === "candle") {
+    const series = chart.addSeries(LWC.CandlestickSeries, {
+      upColor: color("up"),
+      downColor: color("down"),
+      borderVisible: false,
+      wickUpColor: color("up"),
+      wickDownColor: color("down"),
     });
+    series.setData(candleData(records));
+  } else {
+    const series = chart.addSeries(LWC.AreaSeries, {
+      lineColor: color("accent"),
+      topColor: color("accent"),
+      bottomColor: "rgba(88, 166, 255, 0)",
+      lineWidth: 2,
+    });
+    series.setData(lineData(records, "close"));
   }
 
-  if (chart) chart.destroy();
+  // Overlays.
+  if (state.indicators.ema20) {
+    const s = chart.addSeries(LWC.LineSeries, { color: color("orange"), lineWidth: 2 });
+    s.setData(lineData(records, "ema_20d"));
+  }
+  if (state.indicators.ema50) {
+    const s = chart.addSeries(LWC.LineSeries, { color: color("purple"), lineWidth: 2 });
+    s.setData(lineData(records, "ema_50d"));
+  }
+  if (state.indicators.bollinger) {
+    const upper = chart.addSeries(LWC.LineSeries, { color: color("muted"), lineWidth: 1 });
+    const mid = chart.addSeries(LWC.LineSeries, { color: color("muted"), lineWidth: 1, lineStyle: 2 });
+    const lower = chart.addSeries(LWC.LineSeries, { color: color("muted"), lineWidth: 1 });
+    upper.setData(lineData(records, "bb_upper"));
+    mid.setData(lineData(records, "bb_mid"));
+    lower.setData(lineData(records, "bb_lower"));
+  }
 
-  chart = new Chart(document.getElementById("price-chart"), {
-    type: "line",
-    data: { labels, datasets },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: { mode: "index", intersect: false },
-      plugins: {
-        legend: {
-          labels: { color: "#e6edf3", usePointStyle: true },
-        },
-      },
-      scales: {
-        x: {
-          ticks: { color: "#8b949e", maxTicksLimit: 10 },
-          grid: { color: "rgba(48, 54, 61, 0.5)" },
-        },
-        y: {
-          ticks: { color: "#8b949e" },
-          grid: { color: "rgba(48, 54, 61, 0.5)" },
-        },
-      },
-    },
+  // Volume pane.
+  const volumePane = chart.addPane();
+  const volSeries = volumePane.addSeries(LWC.HistogramSeries, {
+    priceFormat: { type: "volume" },
+    lastValueVisible: false,
+    priceLineVisible: false,
+  });
+  volSeries.setData(
+    records.map((r, i) => ({
+      time: parseTime(r.date),
+      value: r.volume || 0,
+      color: i > 0 && r.close >= records[i - 1].close ? color("up") : color("down"),
+    }))
+  );
+
+  // RSI pane.
+  if (state.indicators.rsi) {
+    const rsiPane = chart.addPane();
+    const rsiSeries = rsiPane.addSeries(LWC.LineSeries, { color: color("orange"), lineWidth: 2 });
+    rsiSeries.setData(lineData(records, "rsi_14"));
+  }
+
+  applyStretchFactors();
+  chart.timeScale().fitContent();
+}
+
+function renderCompareChart() {
+  const LWC = window.LightweightCharts;
+  chart = LWC.createChart(el.chartContainer, chartOptions());
+
+  const pairs = [
+    { block: getBlock(state.ticker), color: color("accent") },
+    { block: getBlock(state.compareTicker), color: color("orange") },
+  ].filter((p) => p.block);
+
+  pairs.forEach(({ block, color: c }) => {
+    const records = filterByTimeframe(block.records, state.timeframe);
+    const closes = records.map((r) => r.close);
+    const base = closes.find((v) => v !== null && v !== undefined);
+    if (base === undefined) return;
+    const series = chart.addSeries(LWC.LineSeries, { color: c, lineWidth: 2 });
+    series.setData(
+      records
+        .filter((r) => r.close !== null && r.close !== undefined)
+        .map((r) => ({
+          time: parseTime(r.date),
+          value: ((r.close / base) - 1) * 100,
+        }))
+    );
+  });
+
+  chart.timeScale().fitContent();
+}
+
+function applyStretchFactors() {
+  const panes = chart.panes();
+  const factors = [5, 2, 1];
+  panes.forEach((p, i) => {
+    try {
+      p.setStretchFactor(factors[i] ?? 1);
+    } catch (e) {
+      /* ignore */
+    }
   });
 }
 
-function renderTickers() {
-  const data = marketData.data || [];
-  el.select.innerHTML = "";
+function renderChart() {
+  el.chartContainer.innerHTML = "";
+  if (chart) {
+    try {
+      chart.remove();
+    } catch (e) {
+      /* ignore */
+    }
+    chart = null;
+  }
 
-  if (data.length === 0) {
-    el.select.innerHTML = '<option value="">No data available</option>';
+  if (typeof window.LightweightCharts === "undefined") {
+    el.chartContainer.innerHTML =
+      '<div class="empty-state">Chart library failed to load</div>';
     return;
   }
 
-  const groups = {};
-  data.forEach((b) => {
-    (groups[b.group] = groups[b.group] || []).push(b);
-  });
-
-  GROUP_ORDER.forEach((name) => {
-    if (!groups[name]) return;
-    const optgroup = document.createElement("optgroup");
-    optgroup.label = name;
-    groups[name].forEach((b) => {
-      const opt = document.createElement("option");
-      opt.value = b.ticker;
-      opt.textContent = b.label;
-      optgroup.appendChild(opt);
-    });
-    el.select.appendChild(optgroup);
-  });
-
-  // Any asset with an unknown group is appended last.
-  Object.keys(groups).forEach((name) => {
-    if (GROUP_ORDER.includes(name)) return;
-    const optgroup = document.createElement("optgroup");
-    optgroup.label = name;
-    groups[name].forEach((b) => {
-      const opt = document.createElement("option");
-      opt.value = b.ticker;
-      opt.textContent = b.label;
-      optgroup.appendChild(opt);
-    });
-    el.select.appendChild(optgroup);
-  });
-}
-
-let chartLoadingTimer = null;
-
-function showChartLoading() {
-  el.chartLoading.style.display = "flex";
-  if (chartLoadingTimer) clearTimeout(chartLoadingTimer);
-  chartLoadingTimer = setTimeout(() => {
-    el.chartLoading.style.display = "none";
-  }, 250);
-}
-
-function update() {
-  const ticker = el.select.value;
-  const block = getBlock(ticker);
-  if (!block) return;
-  showChartLoading();
-  renderSummary(block);
-  renderTable(block);
   try {
-    renderChart(block);
+    if (state.compare && state.compareTicker) {
+      renderCompareChart();
+      return;
+    }
+    const block = getBlock(state.ticker);
+    if (!block) return;
+    const records = filterByTimeframe(block.records, state.timeframe);
+    if (records.length === 0) {
+      el.chartContainer.innerHTML = '<div class="empty-state">No data for this range</div>';
+      return;
+    }
+    renderNormalChart(block, records);
   } catch (err) {
     console.error("Chart render failed:", err);
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Alerts, simulator, health                                           */
+/* ------------------------------------------------------------------ */
+
+function renderAlerts() {
+  const alerts = (marketData.alerts || []).slice(0, 5);
+  el.alertTimeline.innerHTML = "";
+  if (alerts.length === 0) {
+    el.alertTimeline.innerHTML = '<p class="muted">No threshold breaches recorded yet.</p>';
+    return;
+  }
+  alerts.forEach((a) => {
+    const div = document.createElement("div");
+    div.className = "timeline-item";
+    div.innerHTML = `
+      <span class="dot"></span>
+      <div class="info">
+        <span class="asset">${a.label || a.ticker}</span>
+        <span class="meta">${a.date || ""} · ${fmtPct(a.daily_return_pct)}</span>
+      </div>
+    `;
+    el.alertTimeline.appendChild(div);
+  });
+}
+
+function runSimulator() {
+  const block = getBlock(state.ticker);
+  const threshold = parseFloat(el.thresholdInput.value);
+  el.simResult.innerHTML = "";
+
+  if (!block || Number.isNaN(threshold)) {
+    el.simResult.textContent = "Enter a valid threshold and select an asset.";
+    return;
+  }
+
+  const hits = (block.records || []).filter(
+    (r) => r.daily_return_pct !== null && r.daily_return_pct <= threshold
+  );
+  const head = `<p><strong>${hits.length}</strong> of <strong>${
+    block.records.length
+  }</strong> sessions for <strong>${block.label}</strong> fell to/below <strong>${threshold}%</strong>.</p>`;
+  if (hits.length === 0) {
+    el.simResult.innerHTML = head;
+    return;
+  }
+  const list = hits
+    .slice(-10)
+    .reverse()
+    .map((r) => `<li>${r.date} — ${fmtPct(r.daily_return_pct)}</li>`)
+    .join("");
+  el.simResult.innerHTML = `${head}<ul>${list}</ul>`;
+}
+
+function openHealthModal() {
+  const meta = marketData.pipeline_meta || {};
+  const status = meta.status === "ok" ? "OK" : "Partial";
+  const statusCls = meta.status === "ok" ? "badge-ok" : "badge-warn";
+  const failed = (meta.tickers_failed || []).join(", ") || "None";
+
+  el.healthBody.innerHTML = `
+    <dl>
+      <dt>Status</dt><dd class="${statusCls}">${status}</dd>
+      <dt>Started</dt><dd>${meta.started_at || "—"}</dd>
+      <dt>Duration</dt><dd>${meta.duration_seconds ?? "—"}s</dd>
+      <dt>Rows processed</dt><dd>${meta.rows_processed ?? "—"}</dd>
+      <dt>Tickers fetched</dt><dd>${meta.tickers_fetched ?? marketData.tickers.length}</dd>
+      <dt>Failed tickers</dt><dd>${failed}</dd>
+      <dt>Last sync</dt><dd>${marketData.generated_at ? relativeTime(marketData.generated_at) : "—"}</dd>
+      <dt>Data stale</dt><dd>${marketData.is_stale ? "Yes" : "No"}</dd>
+    </dl>
+  `;
+  el.modal.hidden = false;
+}
+
+function closeHealthModal() {
+  el.modal.hidden = true;
+}
+
+/* ------------------------------------------------------------------ */
+/* Rendering orchestration                                             */
+/* ------------------------------------------------------------------ */
+
+function renderAll() {
+  const block = getBlock(state.ticker);
+  if (!block) return;
+  renderSummary(block);
+  renderLeaderboard();
+  renderLogs(block);
+  renderChart();
+  renderAlerts();
+}
+
+/* ------------------------------------------------------------------ */
+/* Selectors & wiring                                                  */
+/* ------------------------------------------------------------------ */
+
+function populateSelect(select, excludeTicker) {
+  const data = marketData.data || [];
+  select.innerHTML = "";
+  const groups = {};
+  data.forEach((b) => {
+    if (excludeTicker && b.ticker === excludeTicker) return;
+    (groups[b.group] = groups[b.group] || []).push(b);
+  });
+  GROUP_ORDER.forEach((name) => {
+    if (!groups[name]) return;
+    const og = document.createElement("optgroup");
+    og.label = name;
+    groups[name].forEach((b) => {
+      const opt = document.createElement("option");
+      opt.value = b.ticker;
+      opt.textContent = b.label;
+      og.appendChild(opt);
+    });
+    select.appendChild(og);
+  });
+}
+
+function updateCompareState() {
+  state.compare = el.compareToggle.checked;
+  el.compareSelect.disabled = !state.compare;
+  state.compareTicker = el.compareSelect.value || null;
+  renderChart();
+}
+
+function setTimeframe(tf) {
+  state.timeframe = tf;
+  document.querySelectorAll("#timeframes .seg-btn").forEach((b) => {
+    b.classList.toggle("active", b.dataset.tf === tf);
+  });
+  renderAll();
+}
+
+function setChartType(type) {
+  state.chartType = type;
+  document.querySelectorAll("#chart-types .seg-btn").forEach((b) => {
+    b.classList.toggle("active", b.dataset.type === type);
+  });
+  renderChart();
+}
+
+function toggleTheme() {
+  state.theme = state.theme === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = state.theme;
+  el.themeToggle.textContent = state.theme === "dark" ? "🌙" : "☀️";
+  renderChart();
+}
+
+function startClock() {
+  const update = () => {
+    if (marketData && marketData.generated_at) {
+      const stale = marketData.is_stale;
+      setStatus(
+        stale ? "stale" : "live",
+        `Pipeline ${stale ? "stale" : "Live"} · ${relativeTime(marketData.generated_at)}`
+      );
+    }
+  };
+  update();
+  setInterval(update, 60000);
+}
+
+function wireEvents() {
+  el.select.addEventListener("change", () => {
+    state.ticker = el.select.value;
+    renderAll();
+  });
+
+  el.compareToggle.addEventListener("change", updateCompareState);
+  el.compareSelect.addEventListener("change", () => {
+    state.compareTicker = el.compareSelect.value || null;
+    renderChart();
+  });
+
+  document.querySelectorAll("#timeframes .seg-btn").forEach((b) =>
+    b.addEventListener("click", () => setTimeframe(b.dataset.tf))
+  );
+  document.querySelectorAll("#chart-types .seg-btn").forEach((b) =>
+    b.addEventListener("click", () => setChartType(b.dataset.type))
+  );
+
+  const bindIndicator = (id, key) => {
+    document.getElementById(id).addEventListener("change", (e) => {
+      state.indicators[key] = e.target.checked;
+      renderChart();
+    });
+  };
+  bindIndicator("ind-ema20", "ema20");
+  bindIndicator("ind-ema50", "ema50");
+  bindIndicator("ind-bollinger", "bollinger");
+  bindIndicator("ind-rsi", "rsi");
+
+  document.querySelectorAll("#leaderboard th[data-sort]").forEach((th) =>
+    th.addEventListener("click", () => {
+      const key = th.dataset.sort;
+      if (sortKey === key) sortDir = sortDir === "desc" ? "asc" : "desc";
+      else {
+        sortKey = key;
+        sortDir = "desc";
+      }
+      renderLeaderboard();
+    })
+  );
+
+  el.exportBtn.addEventListener("click", exportCSV);
+  el.simulateBtn.addEventListener("click", runSimulator);
+  el.themeToggle.addEventListener("click", toggleTheme);
+  el.status.addEventListener("click", openHealthModal);
+  el.modal.querySelectorAll("[data-close]").forEach((n) =>
+    n.addEventListener("click", closeHealthModal)
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Boot                                                                */
+/* ------------------------------------------------------------------ */
+
+function showSkeleton() {
+  el.chartContainer.innerHTML = '<div class="chart-loading" style="display:flex;"><span class="spinner"></span></div>';
+  [el.latestClose, el.dailyChange, el.sma].forEach((node) => {
+    node.innerHTML =
+      '<span class="skeleton" style="display:inline-block;width:60%;height:1.4rem;vertical-align:middle;"></span>';
+  });
+}
+
+function clearSkeleton() {
+  const loader = el.chartContainer.querySelector(".chart-loading");
+  if (loader) loader.style.display = "none";
+  [el.latestClose, el.dailyChange, el.sma].forEach((node) => {
+    if (node.querySelector(".skeleton")) node.textContent = "—";
+  });
 }
 
 async function init() {
@@ -279,41 +682,37 @@ async function init() {
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 10000);
-    const res = await fetch(DATA_URL, {
-      cache: "no-store",
-      signal: controller.signal,
-    });
+    const res = await fetch(DATA_URL, { cache: "no-store", signal: controller.signal });
     clearTimeout(timeout);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     marketData = await res.json();
 
-    renderTickers();
-    el.select.addEventListener("change", update);
+    populateSelect(el.select);
+    populateSelect(el.compareSelect);
 
-    if (marketData.generated_at) {
-      setPipelineStatus(
-        "live",
-        `Pipeline Live — Last Sync: ${formatUtc(marketData.generated_at)}`
-      );
-    } else {
-      setPipelineStatus("pending", "Awaiting first run");
+    if ((marketData.data || []).length === 0) {
+      setStatus("pending", "Awaiting first run");
+      el.leaderboardBody.innerHTML =
+        '<tr><td colspan="6" class="empty-state">No data available</td></tr>';
+      el.logsBody.innerHTML =
+        '<tr><td colspan="8" class="empty-state">No records available</td></tr>';
+      return;
     }
 
-    if ((marketData.data || []).length > 0) {
-      update();
-    } else {
-      clearSkeleton();
-      el.tbody.innerHTML =
-        '<tr><td colspan="7" class="empty-state">No records available</td></tr>';
-    }
+    state.ticker = el.select.value;
+    renderAll();
+    startClock();
   } catch (err) {
     console.error("Failed to load market data:", err);
-    setPipelineStatus("error", "Pipeline unavailable");
-    el.tbody.innerHTML =
-      '<tr><td colspan="7" class="empty-state">Unable to load market data</td></tr>';
+    setStatus("error", "Pipeline unavailable");
+    el.leaderboardBody.innerHTML =
+      '<tr><td colspan="6" class="empty-state">Unable to load market data</td></tr>';
+    el.logsBody.innerHTML =
+      '<tr><td colspan="8" class="empty-state">Unable to load market data</td></tr>';
   } finally {
     clearSkeleton();
   }
 }
 
+wireEvents();
 init();
