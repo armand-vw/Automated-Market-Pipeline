@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-09T03:58:09.091931+00:00",
+  "generated_at": "2026-09-10T03:57:02.200378+00:00",
   "tickers": [
     "MSFT",
     "AMZN",
@@ -28,16 +28,6 @@
       "group": "Equities",
       "records": [
         {
-          "date": "2026-07-28",
-          "open": 392.4213,
-          "high": 399.5678,
-          "low": 390.5647,
-          "close": 392.6109,
-          "volume": 32367500,
-          "sma_7d": null,
-          "daily_return_pct": null
-        },
-        {
           "date": "2026-07-29",
           "open": 392.6608,
           "high": 400.4961,
@@ -45,7 +35,7 @@
           "close": 389.8062,
           "volume": 47209000,
           "sma_7d": null,
-          "daily_return_pct": -0.7144
+          "daily_return_pct": null
         },
         {
           "date": "2026-07-30",
@@ -94,7 +84,7 @@
           "low": 484.7674,
           "close": 486.5441,
           "volume": 33388900,
-          "sma_7d": 451.6683,
+          "sma_7d": null,
           "daily_return_pct": -1.0856
         },
         {
@@ -323,9 +313,19 @@
           "high": 495.19,
           "low": 490.15,
           "close": 493.95,
-          "volume": 18863500,
+          "volume": 18882300,
           "sma_7d": 503.2043,
           "daily_return_pct": -1.1507
+        },
+        {
+          "date": "2026-09-09",
+          "open": 493.07,
+          "high": 494.39,
+          "low": 489.8,
+          "close": 491.65,
+          "volume": 12875900,
+          "sma_7d": 500.0786,
+          "daily_return_pct": -0.4656
         }
       ]
     },
@@ -335,16 +335,6 @@
       "group": "Equities",
       "records": [
         {
-          "date": "2026-07-28",
-          "open": 232.85,
-          "high": 233.11,
-          "low": 228.1,
-          "close": 230.86,
-          "volume": 44521600,
-          "sma_7d": null,
-          "daily_return_pct": null
-        },
-        {
           "date": "2026-07-29",
           "open": 229.32,
           "high": 232.82,
@@ -352,7 +342,7 @@
           "close": 226.65,
           "volume": 44957500,
           "sma_7d": null,
-          "daily_return_pct": -1.8236
+          "daily_return_pct": null
         },
         {
           "date": "2026-07-30",
@@ -401,7 +391,7 @@
           "low": 270.73,
           "close": 272.65,
           "volume": 45119800,
-          "sma_7d": 256.9543,
+          "sma_7d": null,
           "daily_return_pct": -1.7194
         },
         {
@@ -630,9 +620,19 @@
           "high": 257.99,
           "low": 254.75,
           "close": 256.97,
-          "volume": 29349000,
+          "volume": 29398000,
           "sma_7d": 258.64,
           "daily_return_pct": -0.5957
+        },
+        {
+          "date": "2026-09-09",
+          "open": 253.12,
+          "high": 254.69,
+          "low": 250.65,
+          "close": 252.4,
+          "volume": 33011800,
+          "sma_7d": 256.6357,
+          "daily_return_pct": -1.7784
         }
       ]
     },
@@ -642,16 +642,6 @@
       "group": "Equities",
       "records": [
         {
-          "date": "2026-07-28",
-          "open": 195.0,
-          "high": 198.7,
-          "low": 192.74,
-          "close": 197.01,
-          "volume": 134111500,
-          "sma_7d": null,
-          "daily_return_pct": null
-        },
-        {
           "date": "2026-07-29",
           "open": 195.85,
           "high": 197.07,
@@ -659,7 +649,7 @@
           "close": 190.01,
           "volume": 147680800,
           "sma_7d": null,
-          "daily_return_pct": -3.5531
+          "daily_return_pct": null
         },
         {
           "date": "2026-07-30",
@@ -708,7 +698,7 @@
           "low": 216.4,
           "close": 219.22,
           "volume": 158187400,
-          "sma_7d": 202.9443,
+          "sma_7d": null,
           "daily_return_pct": 3.4349
         },
         {
@@ -937,9 +927,19 @@
           "high": 233.71,
           "low": 224.85,
           "close": 225.73,
-          "volume": 122580300,
+          "volume": 122965600,
           "sma_7d": 223.5314,
           "daily_return_pct": -2.0099
+        },
+        {
+          "date": "2026-09-09",
+          "open": 225.28,
+          "high": 226.18,
+          "low": 223.46,
+          "close": 223.67,
+          "volume": 82737000,
+          "sma_7d": 224.4057,
+          "daily_return_pct": -0.9126
         }
       ]
     },
@@ -949,16 +949,6 @@
       "group": "Equities",
       "records": [
         {
-          "date": "2026-07-28",
-          "open": 339.737,
-          "high": 342.5945,
-          "low": 335.3108,
-          "close": 339.7869,
-          "volume": 51859000,
-          "sma_7d": null,
-          "daily_return_pct": null
-        },
-        {
           "date": "2026-07-29",
           "open": 339.4373,
           "high": 344.2731,
@@ -966,7 +956,7 @@
           "close": 337.8986,
           "volume": 56090800,
           "sma_7d": null,
-          "daily_return_pct": -0.5557
+          "daily_return_pct": null
         },
         {
           "date": "2026-07-30",
@@ -1015,7 +1005,7 @@
           "low": 305.4066,
           "close": 310.732,
           "volume": 49438800,
-          "sma_7d": 320.3537,
+          "sma_7d": null,
           "daily_return_pct": 0.5236
         },
         {
@@ -1244,9 +1234,19 @@
           "high": 320.7,
           "low": 314.9,
           "close": 316.22,
-          "volume": 35423000,
+          "volume": 35477100,
           "sma_7d": 321.5771,
           "daily_return_pct": -1.172
+        },
+        {
+          "date": "2026-09-09",
+          "open": 315.49,
+          "high": 319.15,
+          "low": 309.9,
+          "close": 315.34,
+          "volume": 65371600,
+          "sma_7d": 320.9543,
+          "daily_return_pct": -0.2783
         }
       ]
     },
@@ -1256,16 +1256,6 @@
       "group": "Equities",
       "records": [
         {
-          "date": "2026-07-28",
-          "open": 327.6894,
-          "high": 335.6643,
-          "low": 324.2316,
-          "close": 333.4956,
-          "volume": 29511900,
-          "sma_7d": null,
-          "daily_return_pct": null
-        },
-        {
           "date": "2026-07-29",
           "open": 334.455,
           "high": 342.28,
@@ -1273,7 +1263,7 @@
           "close": 336.4937,
           "volume": 27501600,
           "sma_7d": null,
-          "daily_return_pct": 0.899
+          "daily_return_pct": null
         },
         {
           "date": "2026-07-30",
@@ -1322,7 +1312,7 @@
           "low": 356.5408,
           "close": 362.1972,
           "volume": 46926300,
-          "sma_7d": 353.173,
+          "sma_7d": null,
           "daily_return_pct": -4.0302
         },
         {
@@ -1551,9 +1541,19 @@
           "high": 339.68,
           "low": 333.22,
           "close": 338.36,
-          "volume": 22864800,
+          "volume": 22915800,
           "sma_7d": 339.4697,
           "daily_return_pct": -0.0295
+        },
+        {
+          "date": "2026-09-09",
+          "open": 331.65,
+          "high": 331.85,
+          "low": 327.9,
+          "close": 330.65,
+          "volume": 33081300,
+          "sma_7d": 337.2243,
+          "daily_return_pct": -2.2786
         }
       ]
     },
@@ -1563,16 +1563,6 @@
       "group": "Equities",
       "records": [
         {
-          "date": "2026-07-28",
-          "open": 596.82,
-          "high": 601.0,
-          "low": 587.0,
-          "close": 593.41,
-          "volume": 12009300,
-          "sma_7d": null,
-          "daily_return_pct": null
-        },
-        {
           "date": "2026-07-29",
           "open": 593.25,
           "high": 599.97,
@@ -1580,7 +1570,7 @@
           "close": 585.61,
           "volume": 22371100,
           "sma_7d": null,
-          "daily_return_pct": -1.3144
+          "daily_return_pct": null
         },
         {
           "date": "2026-07-30",
@@ -1629,7 +1619,7 @@
           "low": 580.12,
           "close": 588.77,
           "volume": 14897200,
-          "sma_7d": 577.3871,
+          "sma_7d": null,
           "daily_return_pct": 0.1412
         },
         {
@@ -1858,9 +1848,19 @@
           "high": 624.8,
           "low": 609.74,
           "close": 613.48,
-          "volume": 18871000,
+          "volume": 18909700,
           "sma_7d": 594.6686,
           "daily_return_pct": -0.5334
+        },
+        {
+          "date": "2026-09-09",
+          "open": 648.64,
+          "high": 657.86,
+          "low": 638.56,
+          "close": 653.69,
+          "volume": 35843200,
+          "sma_7d": 605.4786,
+          "daily_return_pct": 6.5544
         }
       ]
     },
@@ -1870,16 +1870,6 @@
       "group": "Equities",
       "records": [
         {
-          "date": "2026-07-28",
-          "open": 374.36,
-          "high": 385.8,
-          "low": 371.52,
-          "close": 380.91,
-          "volume": 20328400,
-          "sma_7d": null,
-          "daily_return_pct": null
-        },
-        {
           "date": "2026-07-29",
           "open": 380.64,
           "high": 386.12,
@@ -1887,7 +1877,7 @@
           "close": 370.32,
           "volume": 21374400,
           "sma_7d": null,
-          "daily_return_pct": -2.7802
+          "daily_return_pct": null
         },
         {
           "date": "2026-07-30",
@@ -1936,7 +1926,7 @@
           "low": 416.89,
           "close": 418.28,
           "volume": 16880400,
-          "sma_7d": 393.86,
+          "sma_7d": null,
           "daily_return_pct": 0.0287
         },
         {
@@ -2165,9 +2155,19 @@
           "high": 372.7,
           "low": 362.74,
           "close": 368.56,
-          "volume": 30401900,
+          "volume": 30464900,
           "sma_7d": 365.6671,
           "daily_return_pct": 2.9785
+        },
+        {
+          "date": "2026-09-09",
+          "open": 366.23,
+          "high": 368.01,
+          "low": 359.25,
+          "close": 364.38,
+          "volume": 25870100,
+          "sma_7d": 365.0371,
+          "daily_return_pct": -1.1341
         }
       ]
     },
@@ -2177,16 +2177,6 @@
       "group": "Equities",
       "records": [
         {
-          "date": "2026-07-28",
-          "open": 500.33,
-          "high": 513.44,
-          "low": 499.5,
-          "close": 512.37,
-          "volume": 6362100,
-          "sma_7d": null,
-          "daily_return_pct": null
-        },
-        {
           "date": "2026-07-29",
           "open": 511.44,
           "high": 513.36,
@@ -2194,7 +2184,7 @@
           "close": 509.16,
           "volume": 5057500,
           "sma_7d": null,
-          "daily_return_pct": -0.6265
+          "daily_return_pct": null
         },
         {
           "date": "2026-07-30",
@@ -2243,7 +2233,7 @@
           "low": 512.2,
           "close": 518.85,
           "volume": 3749400,
-          "sma_7d": 513.1371,
+          "sma_7d": null,
           "daily_return_pct": 0.3151
         },
         {
@@ -2475,6 +2465,16 @@
           "volume": 4398000,
           "sma_7d": 505.2271,
           "daily_return_pct": -0.0395
+        },
+        {
+          "date": "2026-09-09",
+          "open": 504.1,
+          "high": 509.51,
+          "low": 501.21,
+          "close": 506.72,
+          "volume": 3359600,
+          "sma_7d": 505.4729,
+          "daily_return_pct": 0.176
         }
       ]
     },
@@ -2484,16 +2484,6 @@
       "group": "Equities",
       "records": [
         {
-          "date": "2026-07-28",
-          "open": 385.0,
-          "high": 395.36,
-          "low": 381.3,
-          "close": 392.31,
-          "volume": 18276300,
-          "sma_7d": null,
-          "daily_return_pct": null
-        },
-        {
           "date": "2026-07-29",
           "open": 388.08,
           "high": 391.25,
@@ -2501,7 +2491,7 @@
           "close": 374.67,
           "volume": 21700200,
           "sma_7d": null,
-          "daily_return_pct": -4.4964
+          "daily_return_pct": null
         },
         {
           "date": "2026-07-30",
@@ -2550,7 +2540,7 @@
           "low": 413.07,
           "close": 414.0,
           "volume": 12790400,
-          "sma_7d": 401.6886,
+          "sma_7d": null,
           "daily_return_pct": -0.7599
         },
         {
@@ -2782,6 +2772,16 @@
           "volume": 13079900,
           "sma_7d": 421.0371,
           "daily_return_pct": 2.3525
+        },
+        {
+          "date": "2026-09-09",
+          "open": 434.46,
+          "high": 439.4,
+          "low": 431.87,
+          "close": 435.36,
+          "volume": 7486700,
+          "sma_7d": 423.5857,
+          "daily_return_pct": -0.8292
         }
       ]
     },
@@ -2791,16 +2791,6 @@
       "group": "Equities",
       "records": [
         {
-          "date": "2026-07-28",
-          "open": 1215.8577,
-          "high": 1230.2371,
-          "low": 1203.2857,
-          "close": 1218.9133,
-          "volume": 2375400,
-          "sma_7d": null,
-          "daily_return_pct": null
-        },
-        {
           "date": "2026-07-29",
           "open": 1213.4412,
           "high": 1227.4311,
@@ -2808,7 +2798,7 @@
           "close": 1208.2886,
           "volume": 2170900,
           "sma_7d": null,
-          "daily_return_pct": -0.8717
+          "daily_return_pct": null
         },
         {
           "date": "2026-07-30",
@@ -2857,7 +2847,7 @@
           "low": 1136.8011,
           "close": 1168.186,
           "volume": 6445700,
-          "sma_7d": 1161.3915,
+          "sma_7d": null,
           "daily_return_pct": 4.8562
         },
         {
@@ -3089,6 +3079,16 @@
           "volume": 2400500,
           "sma_7d": 1154.8986,
           "daily_return_pct": -2.2143
+        },
+        {
+          "date": "2026-09-09",
+          "open": 1127.61,
+          "high": 1138.79,
+          "low": 1119.0,
+          "close": 1124.21,
+          "volume": 2045000,
+          "sma_7d": 1147.6986,
+          "daily_return_pct": 0.0267
         }
       ]
     },
@@ -3098,16 +3098,6 @@
       "group": "Equities",
       "records": [
         {
-          "date": "2026-07-29",
-          "open": 25.9255,
-          "high": 26.0243,
-          "low": 25.7873,
-          "close": 25.9453,
-          "volume": 5834762,
-          "sma_7d": null,
-          "daily_return_pct": null
-        },
-        {
           "date": "2026-07-30",
           "open": 25.9255,
           "high": 26.1427,
@@ -3115,7 +3105,7 @@
           "close": 26.1427,
           "volume": 9653829,
           "sma_7d": null,
-          "daily_return_pct": 0.761
+          "daily_return_pct": null
         },
         {
           "date": "2026-08-02",
@@ -3164,7 +3154,7 @@
           "low": 26.1625,
           "close": 26.1625,
           "volume": 9327140,
-          "sma_7d": 26.3176,
+          "sma_7d": null,
           "daily_return_pct": -0.8975
         },
         {
@@ -3376,6 +3366,16 @@
           "volume": 6688799,
           "sma_7d": 26.06,
           "daily_return_pct": 0.0
+        },
+        {
+          "date": "2026-09-08",
+          "open": 25.96,
+          "high": 26.2,
+          "low": 25.92,
+          "close": 26.06,
+          "volume": 8253373,
+          "sma_7d": 26.0543,
+          "daily_return_pct": 0.3852
         }
       ]
     },
@@ -3385,16 +3385,6 @@
       "group": "Indices",
       "records": [
         {
-          "date": "2026-07-28",
-          "open": 7395.5498,
-          "high": 7452.0898,
-          "low": 7382.9502,
-          "close": 7428.7798,
-          "volume": 5590890000,
-          "sma_7d": null,
-          "daily_return_pct": null
-        },
-        {
           "date": "2026-07-29",
           "open": 7418.1602,
           "high": 7450.8398,
@@ -3402,7 +3392,7 @@
           "close": 7316.1499,
           "volume": 5836350000,
           "sma_7d": null,
-          "daily_return_pct": -1.5161
+          "daily_return_pct": null
         },
         {
           "date": "2026-07-30",
@@ -3451,7 +3441,7 @@
           "low": 7720.1699,
           "close": 7723.5498,
           "volume": 5615640000,
-          "sma_7d": 7533.2642,
+          "sma_7d": null,
           "daily_return_pct": -0.1676
         },
         {
@@ -3680,9 +3670,19 @@
           "high": 7717.8101,
           "low": 7666.9902,
           "close": 7673.52,
-          "volume": 2922644000,
+          "volume": 4966930000,
           "sma_7d": 7690.8286,
           "daily_return_pct": -0.584
+        },
+        {
+          "date": "2026-09-09",
+          "open": 7660.6802,
+          "high": 7660.6802,
+          "low": 7624.1602,
+          "close": 7636.3599,
+          "volume": 2739714000,
+          "sma_7d": 7680.0572,
+          "daily_return_pct": -0.4843
         }
       ]
     },
@@ -3692,16 +3692,6 @@
       "group": "Indices",
       "records": [
         {
-          "date": "2026-07-28",
-          "open": 24825.0703,
-          "high": 24984.5,
-          "low": 24581.0098,
-          "close": 24876.9102,
-          "volume": 8584960000,
-          "sma_7d": null,
-          "daily_return_pct": null
-        },
-        {
           "date": "2026-07-29",
           "open": 24863.4805,
           "high": 25054.5293,
@@ -3709,7 +3699,7 @@
           "close": 24442.9395,
           "volume": 8276280000,
           "sma_7d": null,
-          "daily_return_pct": -1.7445
+          "daily_return_pct": null
         },
         {
           "date": "2026-07-30",
@@ -3758,7 +3748,7 @@
           "low": 26348.5098,
           "close": 26363.4395,
           "volume": 9116070000,
-          "sma_7d": 25525.4584,
+          "sma_7d": null,
           "daily_return_pct": -0.8334
         },
         {
@@ -3984,12 +3974,22 @@
         {
           "date": "2026-09-08",
           "open": 26528.5703,
-          "high": 26542.1367,
-          "low": 26341.1738,
-          "close": 26421.4121,
-          "volume": 6802086000,
-          "sma_7d": 26371.9104,
+          "high": 26542.1406,
+          "low": 26341.1699,
+          "close": 26421.4102,
+          "volume": 7714560000,
+          "sma_7d": 26371.9102,
           "daily_return_pct": -0.3229
+        },
+        {
+          "date": "2026-09-09",
+          "open": 26325.0605,
+          "high": 26366.5586,
+          "low": 26184.2148,
+          "close": 26253.3398,
+          "volume": 6592678000,
+          "sma_7d": 26350.613,
+          "daily_return_pct": -0.6361
         }
       ]
     },
@@ -3999,16 +3999,6 @@
       "group": "Indices",
       "records": [
         {
-          "date": "2026-07-28",
-          "open": 110109.6016,
-          "high": 110402.0,
-          "low": 109378.1016,
-          "close": 109904.1016,
-          "volume": 0,
-          "sma_7d": null,
-          "daily_return_pct": null
-        },
-        {
           "date": "2026-07-29",
           "open": 109904.1016,
           "high": 111216.2969,
@@ -4016,7 +4006,7 @@
           "close": 110440.2969,
           "volume": 0,
           "sma_7d": null,
-          "daily_return_pct": 0.4879
+          "daily_return_pct": null
         },
         {
           "date": "2026-07-30",
@@ -4065,7 +4055,7 @@
           "low": 114256.2969,
           "close": 115415.7031,
           "volume": 0,
-          "sma_7d": 112293.9431,
+          "sma_7d": null,
           "daily_return_pct": 1.0147
         },
         {
@@ -4297,6 +4287,16 @@
           "volume": 0,
           "sma_7d": 116437.0134,
           "daily_return_pct": 0.404
+        },
+        {
+          "date": "2026-09-09",
+          "open": 117461.6016,
+          "high": 117527.6016,
+          "low": 115419.1016,
+          "close": 116520.0,
+          "volume": 0,
+          "sma_7d": 116474.5424,
+          "daily_return_pct": -0.8016
         }
       ]
     },
@@ -4306,16 +4306,6 @@
       "group": "FX",
       "records": [
         {
-          "date": "2026-07-30",
-          "open": 16.6488,
-          "high": 16.7074,
-          "low": 16.4557,
-          "close": 16.6604,
-          "volume": 0,
-          "sma_7d": null,
-          "daily_return_pct": null
-        },
-        {
           "date": "2026-07-31",
           "open": 16.5004,
           "high": 16.6185,
@@ -4323,7 +4313,7 @@
           "close": 16.5,
           "volume": 0,
           "sma_7d": null,
-          "daily_return_pct": -0.9629
+          "daily_return_pct": null
         },
         {
           "date": "2026-08-03",
@@ -4372,7 +4362,7 @@
           "low": 16.093,
           "close": 16.3419,
           "volume": 0,
-          "sma_7d": 16.453,
+          "sma_7d": null,
           "daily_return_pct": 0.2275
         },
         {
@@ -4597,13 +4587,23 @@
         },
         {
           "date": "2026-09-09",
-          "open": 15.9913,
-          "high": 16.0103,
-          "low": 15.982,
-          "close": 16.0009,
+          "open": 16.0009,
+          "high": 16.0661,
+          "low": 15.9676,
+          "close": 16.0069,
           "volume": 0,
-          "sma_7d": 16.0332,
-          "daily_return_pct": 0.1111
+          "sma_7d": 16.0341,
+          "daily_return_pct": 0.1482
+        },
+        {
+          "date": "2026-09-10",
+          "open": 16.03,
+          "high": 16.0607,
+          "low": 16.0073,
+          "close": 16.0391,
+          "volume": 0,
+          "sma_7d": 16.0265,
+          "daily_return_pct": 0.2014
         }
       ]
     },
@@ -4613,16 +4613,6 @@
       "group": "FX",
       "records": [
         {
-          "date": "2026-07-30",
-          "open": 1.1468,
-          "high": 1.1535,
-          "low": 1.1435,
-          "close": 1.1467,
-          "volume": 0,
-          "sma_7d": null,
-          "daily_return_pct": null
-        },
-        {
           "date": "2026-07-31",
           "open": 1.1526,
           "high": 1.1526,
@@ -4630,7 +4620,7 @@
           "close": 1.1524,
           "volume": 0,
           "sma_7d": null,
-          "daily_return_pct": 0.4909
+          "daily_return_pct": null
         },
         {
           "date": "2026-08-03",
@@ -4679,7 +4669,7 @@
           "low": 1.1518,
           "close": 1.1525,
           "volume": 0,
-          "sma_7d": 1.1522,
+          "sma_7d": null,
           "daily_return_pct": -0.2824
         },
         {
@@ -4905,12 +4895,22 @@
         {
           "date": "2026-09-09",
           "open": 1.1629,
-          "high": 1.1636,
-          "low": 1.1628,
-          "close": 1.1633,
+          "high": 1.1654,
+          "low": 1.1622,
+          "close": 1.1627,
           "volume": 0,
-          "sma_7d": 1.1615,
-          "daily_return_pct": 0.0489
+          "sma_7d": 1.1614,
+          "daily_return_pct": -0.0023
+        },
+        {
+          "date": "2026-09-10",
+          "open": 1.1639,
+          "high": 1.1644,
+          "low": 1.1633,
+          "close": 1.1641,
+          "volume": 0,
+          "sma_7d": 1.1617,
+          "daily_return_pct": 0.1211
         }
       ]
     },
@@ -4920,16 +4920,6 @@
       "group": "FX",
       "records": [
         {
-          "date": "2026-07-30",
-          "open": 22.2577,
-          "high": 22.2824,
-          "low": 22.0722,
-          "close": 22.2719,
-          "volume": 0,
-          "sma_7d": null,
-          "daily_return_pct": null
-        },
-        {
           "date": "2026-07-31",
           "open": 22.2086,
           "high": 22.2796,
@@ -4937,7 +4927,7 @@
           "close": 22.2085,
           "volume": 0,
           "sma_7d": null,
-          "daily_return_pct": -0.2848
+          "daily_return_pct": null
         },
         {
           "date": "2026-08-03",
@@ -4986,7 +4976,7 @@
           "low": 21.7414,
           "close": 21.9891,
           "volume": 0,
-          "sma_7d": 22.122,
+          "sma_7d": null,
           "daily_return_pct": 0.1329
         },
         {
@@ -5211,13 +5201,23 @@
         },
         {
           "date": "2026-09-09",
-          "open": 21.6217,
-          "high": 21.6839,
-          "low": 21.6116,
-          "close": 21.6737,
+          "open": 21.6709,
+          "high": 21.7608,
+          "low": 21.6574,
+          "close": 21.6751,
           "volume": 0,
-          "sma_7d": 21.6922,
-          "daily_return_pct": 0.1123
+          "sma_7d": 21.6924,
+          "daily_return_pct": 0.119
+        },
+        {
+          "date": "2026-09-10",
+          "open": 21.6787,
+          "high": 21.7532,
+          "low": 21.6786,
+          "close": 21.7378,
+          "volume": 0,
+          "sma_7d": 21.6809,
+          "daily_return_pct": 0.289
         }
       ]
     },
@@ -5227,16 +5227,6 @@
       "group": "Commodities",
       "records": [
         {
-          "date": "2026-08-04",
-          "open": 4050.5,
-          "high": 4095.3999,
-          "low": 4048.8,
-          "close": 4095.3999,
-          "volume": 426,
-          "sma_7d": null,
-          "daily_return_pct": null
-        },
-        {
           "date": "2026-08-05",
           "open": 4130.0,
           "high": 4262.2002,
@@ -5244,7 +5234,7 @@
           "close": 4245.7998,
           "volume": 1349,
           "sma_7d": null,
-          "daily_return_pct": 3.6724
+          "daily_return_pct": null
         },
         {
           "date": "2026-08-06",
@@ -5293,7 +5283,7 @@
           "low": 4406.2998,
           "close": 4408.8999,
           "volume": 660,
-          "sma_7d": 4296.7999,
+          "sma_7d": null,
           "daily_return_pct": 0.5909
         },
         {
@@ -5468,13 +5458,23 @@
         },
         {
           "date": "2026-09-08",
-          "open": 4399.0,
-          "high": 4428.3999,
-          "low": 4384.1001,
-          "close": 4421.6001,
-          "volume": 19867,
-          "sma_7d": 4423.8,
-          "daily_return_pct": -0.1851
+          "open": 4391.8999,
+          "high": 4406.1001,
+          "low": 4384.3999,
+          "close": 4393.8999,
+          "volume": 215,
+          "sma_7d": 4419.8428,
+          "daily_return_pct": -0.8104
+        },
+        {
+          "date": "2026-09-09",
+          "open": 4448.0,
+          "high": 4464.5,
+          "low": 4433.2002,
+          "close": 4452.1001,
+          "volume": 20777,
+          "sma_7d": 4416.1286,
+          "daily_return_pct": 1.3246
         }
       ]
     },
@@ -5484,16 +5484,6 @@
       "group": "Commodities",
       "records": [
         {
-          "date": "2026-08-04",
-          "open": 80.1,
-          "high": 82.33,
-          "low": 75.11,
-          "close": 75.77,
-          "volume": 362270,
-          "sma_7d": null,
-          "daily_return_pct": null
-        },
-        {
           "date": "2026-08-05",
           "open": 75.17,
           "high": 76.7,
@@ -5501,7 +5491,7 @@
           "close": 75.22,
           "volume": 259965,
           "sma_7d": null,
-          "daily_return_pct": -0.7259
+          "daily_return_pct": null
         },
         {
           "date": "2026-08-06",
@@ -5550,7 +5540,7 @@
           "low": 82.4,
           "close": 83.27,
           "volume": 250779,
-          "sma_7d": 79.2943,
+          "sma_7d": null,
           "daily_return_pct": 0.0841
         },
         {
@@ -5725,13 +5715,23 @@
         },
         {
           "date": "2026-09-08",
-          "open": 94.31,
-          "high": 94.78,
-          "low": 94.15,
-          "close": 94.23,
-          "volume": 20123,
-          "sma_7d": 89.6286,
-          "daily_return_pct": 3.0061
+          "open": 92.26,
+          "high": 94.73,
+          "low": 90.87,
+          "close": 93.03,
+          "volume": 435231,
+          "sma_7d": 89.4571,
+          "daily_return_pct": 1.6944
+        },
+        {
+          "date": "2026-09-09",
+          "open": 96.88,
+          "high": 97.79,
+          "low": 95.94,
+          "close": 96.09,
+          "volume": 22217,
+          "sma_7d": 91.27,
+          "daily_return_pct": 3.2893
         }
       ]
     }
