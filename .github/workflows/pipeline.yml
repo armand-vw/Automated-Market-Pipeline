@@ -37,7 +37,7 @@ jobs:
         run: ruff check .
 
       - name: Test
-        run: pytest -q
+        run: python -m pytest -q
 
       - name: Run ETL pipeline
         env:
