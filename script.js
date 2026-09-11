@@ -4,6 +4,15 @@
 
 const DATA_URL = "./data/market_data.json";
 
+// Fire-and-forget analytics event (no-op when the tracker is unavailable).
+function track(name, params) {
+  try {
+    if (window.amp && window.amp.track) window.amp.track(name, params);
+  } catch (e) {
+    /* ignore */
+  }
+}
+
 const GROUP_ORDER = ["Equities", "Indices", "FX", "Commodities", "Crypto"];
 
 const THEME_COLORS = {
@@ -261,6 +270,7 @@ function exportCSV() {
   a.download = `${block.ticker}_${state.timeframe}.csv`;
   a.click();
   URL.revokeObjectURL(url);
+  track("csv_export", { ticker: block.ticker, timeframe: state.timeframe });
 }
 
 /* ------------------------------------------------------------------ */
@@ -494,6 +504,7 @@ function runSimulator() {
     .map((r) => `<li>${r.date} — ${fmtPct(r.daily_return_pct)}</li>`)
     .join("");
   el.simResult.innerHTML = `${head}<ul>${list}</ul>`;
+  track("threshold_simulator_run", { ticker: block.ticker, threshold });
 }
 
 function openHealthModal() {
@@ -515,6 +526,7 @@ function openHealthModal() {
     </dl>
   `;
   el.modal.hidden = false;
+  track("health_modal_opened");
 }
 
 function closeHealthModal() {
@@ -565,6 +577,12 @@ function updateCompareState() {
   state.compare = el.compareToggle.checked;
   el.compareSelect.disabled = !state.compare;
   state.compareTicker = el.compareSelect.value || null;
+  if (state.compare) {
+    track("comparison_enabled", {
+      primary: state.ticker,
+      compare: state.compareTicker,
+    });
+  }
   renderChart();
 }
 
@@ -573,6 +591,7 @@ function setTimeframe(tf) {
   document.querySelectorAll("#timeframes .seg-btn").forEach((b) => {
     b.classList.toggle("active", b.dataset.tf === tf);
   });
+  track("timeframe_changed", { timeframe: tf });
   renderAll();
 }
 
@@ -581,6 +600,7 @@ function setChartType(type) {
   document.querySelectorAll("#chart-types .seg-btn").forEach((b) => {
     b.classList.toggle("active", b.dataset.type === type);
   });
+  track("chart_type_changed", { type });
   renderChart();
 }
 
@@ -588,6 +608,7 @@ function toggleTheme() {
   state.theme = state.theme === "dark" ? "light" : "dark";
   document.documentElement.dataset.theme = state.theme;
   el.themeToggle.textContent = state.theme === "dark" ? "🌙" : "☀️";
+  track("theme_toggled", { theme: state.theme });
   renderChart();
 }
 
@@ -608,12 +629,14 @@ function startClock() {
 function wireEvents() {
   el.select.addEventListener("change", () => {
     state.ticker = el.select.value;
+    track("asset_changed", { ticker: state.ticker });
     renderAll();
   });
 
   el.compareToggle.addEventListener("change", updateCompareState);
   el.compareSelect.addEventListener("change", () => {
     state.compareTicker = el.compareSelect.value || null;
+    track("comparison_asset_changed", { compare: state.compareTicker });
     renderChart();
   });
 
@@ -627,6 +650,7 @@ function wireEvents() {
   const bindIndicator = (id, key) => {
     document.getElementById(id).addEventListener("change", (e) => {
       state.indicators[key] = e.target.checked;
+      track("indicator_toggled", { indicator: key, enabled: e.target.checked });
       renderChart();
     });
   };

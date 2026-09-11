@@ -16,6 +16,7 @@ A serverless, decoupled market data pipeline and analytics dashboard. A Python E
 - **Market overview** — a sortable leaderboard with sparklines across all assets.
 - **Discord alerts** — a rich embed fires when an asset's daily return falls at or below `-2.5%`, with a persisted alert history.
 - **Tooling** — CSV export, a threshold simulator, a clickable system-health modal, and a dark/light theme.
+- **Privacy-first analytics** — a zero-dependency tracker records pageviews and UI interactions in the visitor's own browser; an in-app analytics view (`analytics.html`) summarizes them. No external services, IDs, or accounts.
 
 ## Tracked assets
 
@@ -54,6 +55,8 @@ A serverless, decoupled market data pipeline and analytics dashboard. A Python E
 ├── vendor/lightweight-charts...js   # Vendored charting library
 ├── data/market_data.json            # Generated dataset (committed nightly)
 ├── index.html / style.css / script.js  # Static dashboard
+├── analytics.js                     # First-party tracking (localStorage)
+├── analytics.html / analytics-dashboard.js  # Privacy-first analytics view
 ├── main.py                          # Orchestrator entry point
 └── requirements.txt                 # Runtime dependencies
 ```

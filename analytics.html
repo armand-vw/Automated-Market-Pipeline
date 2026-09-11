@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Privacy-first local analytics for the Automated Market Pipeline."
+    />
+    <title>Analytics — Automated Market Pipeline</title>
+    <link rel="stylesheet" href="./style.css" />
+    <style>
+      .bars {
+        display: flex;
+        align-items: flex-end;
+        gap: 6px;
+        height: 160px;
+        overflow-x: auto;
+      }
+      .bar-col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-end;
+        flex: 1;
+        min-width: 28px;
+        height: 100%;
+      }
+      .bar {
+        width: 100%;
+        max-width: 34px;
+        background: var(--accent);
+        border-radius: 4px 4px 0 0;
+        min-height: 2px;
+      }
+      .bar-label {
+        color: var(--text-muted);
+        font-size: 0.7rem;
+        margin-top: 6px;
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        max-height: 70px;
+      }
+      .bar-value {
+        color: var(--text);
+        font-size: 0.75rem;
+        font-variant-numeric: tabular-nums;
+      }
+      .event-feed {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .event-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 8px 10px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 0.85rem;
+      }
+      .event-row .name {
+        font-weight: 600;
+      }
+      .event-row .detail {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+      }
+      dl.info {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 8px 16px;
+      }
+      dl.info dt {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+      }
+    </style>
+    <script src="./analytics-dashboard.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-row">
+        <div>
+          <h1>Analytics</h1>
+          <p class="subtitle">Privacy-first &middot; local to this browser &middot; no data leaves your device</p>
+        </div>
+        <div class="header-actions">
+          <a href="./index.html" class="ghost-btn">&#8592; Dashboard</a>
+          <button id="reset-btn" class="ghost-btn">Reset data</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="cards" aria-label="Summary metrics">
+        <article class="card">
+          <h2>Pageviews</h2>
+          <p id="kpi-pageviews" class="metric">—</p>
+        </article>
+        <article class="card">
+          <h2>Visits</h2>
+          <p id="kpi-visits" class="metric">—</p>
+        </article>
+        <article class="card">
+          <h2>Events</h2>
+          <p id="kpi-events" class="metric">—</p>
+        </article>
+      </section>
+
+      <section class="panel">
+        <h2>Pageviews over time</h2>
+        <div id="bar-chart" class="bars"></div>
+      </section>
+
+      <div class="two-col">
+        <section class="panel">
+          <h2>Top interactions</h2>
+          <div class="table-wrap">
+            <table id="top-events">
+              <thead>
+                <tr>
+                  <th>Event</th>
+                  <th>Count</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>This device</h2>
+          <dl class="info">
+            <dt>Device</dt><dd id="info-device">—</dd>
+            <dt>OS</dt><dd id="info-os">—</dd>
+            <dt>Browser</dt><dd id="info-browser">—</dd>
+            <dt>First seen</dt><dd id="info-first">—</dd>
+          </dl>
+        </section>
+      </div>
+
+      <section class="panel">
+        <h2>Recent events</h2>
+        <div id="recent-events" class="event-feed"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>Zero-dependency analytics &middot; stored in your browser's localStorage</p>
+      </div>
+    </footer>
+  </body>
+</html>
