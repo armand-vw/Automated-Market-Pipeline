@@ -1,4 +1,4 @@
-// Analytics dashboard for the Automated Market Pipeline.
+// Analytics dashboard for the Automated Market Pipeline (passcode protected).
 // Reads the first-party tracking data recorded by analytics.js (index.html)
 // from localStorage and renders a privacy-first, in-browser summary.
 // The storage key MUST match the one in analytics.js.
@@ -7,6 +7,10 @@
   "use strict";
 
   var STORAGE_KEY = "amp.analytics.v1";
+  var UNLOCK_KEY = "amp.analytics.unlocked";
+
+  // SHA-256 of the access passcode (the plaintext is never stored here).
+  var PASSCODE_HASH = "2878967ccbc62062cada6d6238d7c641f869dac57ed4c4cab410b99f90e8fe81";
 
   var el = {
     pageviews: document.getElementById("kpi-pageviews"),
@@ -20,7 +24,71 @@
     browser: document.getElementById("info-browser"),
     firstSeen: document.getElementById("info-first"),
     reset: document.getElementById("reset-btn"),
+    lockScreen: document.getElementById("lock-screen"),
+    dashboard: document.getElementById("dashboard-content"),
+    passcode: document.getElementById("passcode-input"),
+    unlock: document.getElementById("unlock-btn"),
+    lockError: document.getElementById("lock-error"),
   };
+
+  /* ------------------------------------------------------------------ */
+  /* Passcode gate                                                       */
+  /* ------------------------------------------------------------------ */
+
+  async function sha256Hex(str) {
+    if (window.crypto && window.crypto.subtle) {
+      var buf = await window.crypto.subtle.digest(
+        "SHA-256",
+        new TextEncoder().encode(str)
+      );
+      var bytes = new Uint8Array(buf);
+      var hex = "";
+      for (var i = 0; i < bytes.length; i++) {
+        hex += bytes[i].toString(16).padStart(2, "0");
+      }
+      return hex;
+    }
+    return "";
+  }
+
+  function isUnlocked() {
+    try {
+      return localStorage.getItem(UNLOCK_KEY) === "1";
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function showDashboard() {
+    el.lockScreen.hidden = true;
+    el.dashboard.hidden = false;
+    render();
+  }
+
+  function showLock() {
+    el.lockScreen.hidden = false;
+    el.dashboard.hidden = true;
+  }
+
+  async function tryUnlock() {
+    var hash = await sha256Hex(el.passcode.value || "");
+    if (hash && hash === PASSCODE_HASH) {
+      try {
+        localStorage.setItem(UNLOCK_KEY, "1");
+      } catch (e) {
+        /* ignore */
+      }
+      el.passcode.value = "";
+      el.lockError.style.display = "none";
+      showDashboard();
+    } else {
+      el.lockError.style.display = "block";
+    }
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Data + rendering                                                    */
+  /* ------------------------------------------------------------------ */
 
   function load() {
     try {
@@ -181,6 +249,15 @@
     renderDevice(data);
   }
 
+  /* ------------------------------------------------------------------ */
+  /* Wiring + boot                                                       */
+  /* ------------------------------------------------------------------ */
+
+  el.unlock.addEventListener("click", tryUnlock);
+  el.passcode.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") tryUnlock();
+  });
+
   el.reset.addEventListener("click", function () {
     try {
       localStorage.removeItem(STORAGE_KEY);
@@ -190,5 +267,9 @@
     render();
   });
 
-  render();
+  if (isUnlocked()) {
+    showDashboard();
+  } else {
+    showLock();
+  }
 })();

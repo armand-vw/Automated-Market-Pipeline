@@ -88,12 +88,22 @@
         </div>
         <div class="header-actions">
           <a href="./index.html" class="ghost-btn">&#8592; Dashboard</a>
-          <button id="reset-btn" class="ghost-btn">Reset data</button>
         </div>
       </div>
     </header>
 
     <main class="container">
+      <section id="lock-screen" class="panel">
+        <h2>Private</h2>
+        <p class="muted">Enter the passcode to view analytics.</p>
+        <div class="sim-row">
+          <input id="passcode-input" type="password" placeholder="Passcode" autocomplete="off" />
+          <button id="unlock-btn" class="ghost-btn">Unlock</button>
+        </div>
+        <p id="lock-error" class="metric negative" style="font-size:0.9rem;display:none;">Incorrect passcode.</p>
+      </section>
+
+      <div id="dashboard-content" hidden>
       <section class="cards" aria-label="Summary metrics">
         <article class="card">
           <h2>Pageviews</h2>
@@ -145,6 +155,11 @@
         <h2>Recent events</h2>
         <div id="recent-events" class="event-feed"></div>
       </section>
+
+      <div style="display:flex;justify-content:flex-end;">
+        <button id="reset-btn" class="ghost-btn">Reset data</button>
+      </div>
+      </div>
     </main>
 
     <footer class="site-footer">
