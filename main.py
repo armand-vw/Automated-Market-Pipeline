@@ -5,8 +5,8 @@ import sys
 from datetime import UTC, datetime
 from typing import Any
 
-from src import fetcher, notifier, processor
-from src.config import MAX_ALERTS, OUTPUT_PATH
+from market_pipeline import fetcher, notifier, processor
+from market_pipeline.config import MAX_ALERTS, OUTPUT_PATH
 
 logging.basicConfig(
     level=logging.INFO,

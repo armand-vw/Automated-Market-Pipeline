@@ -3,7 +3,7 @@
 import pandas as pd
 import pytest
 
-from src.processor import _round, build_payload, clean_frame
+from market_pipeline.processor import _round, build_payload, clean_frame
 
 
 def _raw_frame() -> pd.DataFrame:

@@ -6,7 +6,7 @@ import time
 import pandas as pd
 import yfinance as yf
 
-from src.config import LOOKBACK_DAYS, TICKERS
+from market_pipeline.config import LOOKBACK_DAYS, TICKERS
 
 logger = logging.getLogger(__name__)
 

@@ -1,6 +1,6 @@
 """Tests for configuration loading."""
 
-import src.config as config
+import market_pipeline.config as config
 
 
 def test_tickers_loaded_from_json():

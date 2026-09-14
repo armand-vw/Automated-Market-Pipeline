@@ -4,7 +4,7 @@
   "alert_threshold": -2.5,
   "staleness_days": 5,
   "max_alerts": 50,
-  "output_path": "data/market_data.json",
+  "output_path": "web/data/market_data.json",
   "discord_webhook_env": "DISCORD_WEBHOOK_URL",
   "assets": [
     { "ticker": "MSFT", "label": "Microsoft", "group": "Equities", "decimals": 2 },

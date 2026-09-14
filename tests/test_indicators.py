@@ -3,7 +3,7 @@
 import pandas as pd
 import pytest
 
-from src.indicators import (
+from market_pipeline.indicators import (
     bollinger,
     compute_indicators,
     daily_return,

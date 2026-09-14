@@ -7,7 +7,7 @@ from typing import Any
 
 import pandas as pd
 
-from src.config import (
+from market_pipeline.config import (
     OUTPUT_PATH,
     SMA_WINDOW,
     STALENESS_DAYS,
@@ -15,7 +15,7 @@ from src.config import (
     TICKER_GROUPS,
     TICKER_LABELS,
 )
-from src.indicators import compute_indicators
+from market_pipeline.indicators import compute_indicators
 
 logger = logging.getLogger(__name__)
 

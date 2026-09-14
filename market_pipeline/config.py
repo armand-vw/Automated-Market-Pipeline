@@ -20,7 +20,7 @@ SMA_WINDOW = int(_CONFIG.get("sma_window", 7))
 ALERT_THRESHOLD = float(_CONFIG.get("alert_threshold", -2.5))
 STALENESS_DAYS = int(_CONFIG.get("staleness_days", 5))
 MAX_ALERTS = int(_CONFIG.get("max_alerts", 50))
-OUTPUT_PATH = _CONFIG.get("output_path", "data/market_data.json")
+OUTPUT_PATH = _CONFIG.get("output_path", "web/data/market_data.json")
 DISCORD_WEBHOOK_ENV = _CONFIG.get("discord_webhook_env", "DISCORD_WEBHOOK_URL")
 
 _ASSETS: list[dict[str, Any]] = _CONFIG.get("assets", [])

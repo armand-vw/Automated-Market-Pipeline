@@ -7,6 +7,7 @@ A serverless, decoupled market data pipeline and analytics dashboard. A Python E
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/armand-vw/Automated-Market-Pipeline/pipeline.yml?label=pipeline)
 ![GitHub Pages](https://img.shields.io/badge/pages-live-brightgreen)
 ![Python](https://img.shields.io/badge/python-3.11-blue)
+![License](https://img.shields.io/badge/license-MIT-blue)
 
 ## Features
 
@@ -31,12 +32,14 @@ A serverless, decoupled market data pipeline and analytics dashboard. A Python E
 ## Architecture
 
 ```
-┌─────────────┐   ┌─────────────┐   ┌─────────────┐   ┌─────────────┐
-│  fetcher.py │──▶│ processor.py │──▶│ notifier.py │──▶│ data/*.json │
-└─────────────┘   └─────┬───────┘   └─────────────┘   └──────┬──────┘
-      yfinance         indicators.py         Discord webhook         │
-                       (registry)                                    ▼
-                                              GitHub Pages (index.html + script.js)
+┌─────────────┐   ┌──────────────┐   ┌─────────────┐
+│  fetcher.py │──▶│ processor.py │──▶│ notifier.py │──▶ Discord webhook
+└─────────────┘   └──────┬───────┘   └─────────────┘
+      yfinance      indicators.py
+                    (registry)
+                          │
+                          ▼
+              web/data/market_data.json  ──▶  GitHub Pages (web/ static site)
 ```
 
 ## Project structure
@@ -44,21 +47,24 @@ A serverless, decoupled market data pipeline and analytics dashboard. A Python E
 ```
 .
 ├── .github/workflows/pipeline.yml   # CI: lint + test + ETL + auto-commit + deploy
-├── src/
+├── market_pipeline/                 # Python ETL package
 │   ├── config.py                    # Loads config.json
 │   ├── fetcher.py                   # yfinance extraction (retry/backoff)
 │   ├── indicators.py                # Extensible indicator registry
 │   ├── processor.py                 # Clean, dedupe, indicators, export
 │   └── notifier.py                  # Discord threshold alert dispatcher
 ├── tests/                           # pytest unit tests
+├── web/                             # Static site (the only thing deployed to Pages)
+│   ├── index.html                   # Dashboard
+│   ├── analytics.html               # Passcode-gated local analytics view
+│   ├── assets/css/style.css
+│   ├── assets/js/                   # script.js, analytics.js, analytics-dashboard.js
+│   ├── vendor/lightweight-charts... # Vendored charting library
+│   └── data/market_data.json        # Generated dataset (committed nightly)
 ├── config.json                      # Assets, thresholds, lookback, indicators
-├── vendor/lightweight-charts...js   # Vendored charting library
-├── data/market_data.json            # Generated dataset (committed nightly)
-├── index.html / style.css / script.js  # Static dashboard
-├── analytics.js                     # First-party tracking (localStorage)
-├── analytics-dashboard.js           # Passcode-protected analytics view logic
 ├── main.py                          # Orchestrator entry point
-└── requirements.txt                 # Runtime dependencies
+├── pyproject.toml                   # Metadata, dependencies, ruff + pytest config
+└── LICENSE
 ```
 
 ## Getting started (local)
@@ -69,7 +75,7 @@ cd Automated-Market-Pipeline
 
 python3.11 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt -r requirements-dev.txt
+pip install -e ".[dev]"
 
 # (Optional) receive Discord alerts
 export DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/..."
@@ -98,14 +104,14 @@ All tunable settings live in [`config.json`](config.json):
 ### Adding an asset or indicator
 
 - **Asset** — append an entry to `assets` in `config.json` (ticker, label, group, decimals).
-- **Indicator** — add a pure function in `src/indicators.py` and register it in the `INDICATORS` dict; the processor applies it automatically.
+- **Indicator** — add a pure function in `market_pipeline/indicators.py` and register it in the `INDICATORS` dict; the processor applies it automatically.
 
 ## Deployment
 
 1. **Discord secret** — *Settings → Secrets and variables → Actions* → add `DISCORD_WEBHOOK_URL`.
 2. **GitHub Pages** — *Settings → Pages* → Source: **GitHub Actions**.
-3. The nightly workflow (`0 0 * * *`) and any manual run (*Actions → Market Data Pipeline → Run workflow*) lint, test, fetch data, update `data/market_data.json`, commit it back to `main`, and redeploy the site.
+3. The nightly workflow (`0 0 * * *`) and any manual run (*Actions → Market Data Pipeline → Run workflow*) lint, test, fetch data, update `web/data/market_data.json`, commit it back to `main`, and redeploy the site.
 
 ## License
 
-MIT © [armand-vw](https://github.com/armand-vw)
+MIT © [armand-vw](https://github.com/armand-vw) — see [LICENSE](LICENSE).

@@ -7,7 +7,7 @@ from typing import Any
 
 import requests
 
-from src.config import ALERT_THRESHOLD, DISCORD_WEBHOOK_ENV
+from market_pipeline.config import ALERT_THRESHOLD, DISCORD_WEBHOOK_ENV
 
 logger = logging.getLogger(__name__)
 

@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "automated-market-pipeline"
+version = "1.0.0"
+description = "Serverless market data ETL pipeline with a static analytics dashboard."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "armand-vw" }]
+dependencies = [
+  "yfinance>=0.2.36",
+  "pandas>=2.0.0",
+  "requests>=2.31.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0.0", "ruff>=0.5.0"]
+
+[project.urls]
+Homepage = "https://armand-vw.github.io/Automated-Market-Pipeline/"
+Source = "https://github.com/armand-vw/Automated-Market-Pipeline"
+
+[tool.setuptools]
+packages = ["market_pipeline"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["B008", "E501"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
